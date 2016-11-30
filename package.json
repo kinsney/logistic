@@ -1,0 +1,14 @@
+{
+  "name": "logistic",
+  "version": "1.0.0",
+  "description": "secure logistic",
+  "main": "index.js",
+  "scripts": {
+    "test": "python3 manager runserver"
+  },
+  "author": "kinsney",
+  "license": "ISC",
+  "dependencies": {
+    "semantic-ui": "^2.2.6"
+  }
+}

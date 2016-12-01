@@ -54,7 +54,8 @@ class Worker(models.Model):
         return self.user.username
     def get_today_mission(self):
         today = datetime.date.today()
-        return self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year)
+        # return self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year)
+        return self.mission_set.all()
     class Meta:
         verbose_name = '工作人员'
         verbose_name_plural = '工作人员'

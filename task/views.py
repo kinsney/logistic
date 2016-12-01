@@ -15,6 +15,7 @@ def get_mission(request):
     for mission in missions:
         guarders = mission.worker.filter(profile="guarder")
         driver = mission.worker.get(profile="driver")
+        tasks = mission.task_set.order_by('order')
         car = mission.car
         guardersInfo = []
         for guarder in guarders:
@@ -25,6 +26,23 @@ def get_mission(request):
                 "phone":guarder.user.username
             }
             guardersInfo.append(guarderInfo)
+        tasksInfo = []
+        for task in tasks:
+            containers = task.container.all()
+            containersInfo = []
+            for container in containers:
+                containerInfo = {
+                    "number":container.number,
+                }
+                containersInfo.append(containerInfo)
+            taskInfo = {
+                "origin":task.origin.name,
+                "target":task.target.name,
+                "parent":task.target.parent.name,
+                "status":task.status,
+                "containers":containersInfo
+            }
+            tasksInfo.append(taskInfo)
         missionInfo = {
             "car":{
                 "license":car.license,
@@ -38,8 +56,8 @@ def get_mission(request):
             },
             "guarders":guardersInfo,
             "time_start":mission.time_start.strftime("%Y-%m-%d %H:%M:%S"),
-            "time_end":mission.time_end.strftime("%Y-%m-%d %H:%M:%S")
-
+            "time_end":mission.time_end.strftime("%Y-%m-%d %H:%M:%S"),
+            "tasksInfo":tasksInfo
         }
         missionInfos.append(missionInfo)
     return HttpResponse(json.dumps(missionInfos))

@@ -12,6 +12,7 @@ def get_mission(request):
     user = User.objects.get(username=request.POST["phone"])
     missions = user.worker.get_today_mission()
     missionInfos = []
+    #print(missions)
     for mission in missions:
         guarders = mission.worker.filter(profile="guarder")
         driver = mission.worker.get(profile="driver")
@@ -28,19 +29,27 @@ def get_mission(request):
             guardersInfo.append(guarderInfo)
         tasksInfo = []
         for task in tasks:
-            containers = task.container.all()
-            containersInfo = []
-            for container in containers:
-                containerInfo = {
-                    "number":container.number,
+            load_containers = task.load_container.all()
+            load_containersInfo = []
+            for load_container in load_containers:
+                load_containerInfo = {
+                    "number":load_container.number,
                 }
-                containersInfo.append(containerInfo)
+                load_containersInfo.append(load_containerInfo)
+            unload_containers = task.unload_container.all()
+            unload_containersInfo = []
+            for unload_container in unload_containers:
+                unload_containerInfo = {
+                    "number":unload_container.number,
+                }
+                unload_containersInfo.append(unload_containerInfo)
             taskInfo = {
                 "origin":task.origin.name,
                 "target":task.target.name,
-                "parent":task.target.parent.name,
+                #"parent":task.target.parent.name,
                 "status":task.status,
-                "containers":containersInfo
+                "load_containers":load_containersInfo,
+                "unload_containers":unload_containersInfo
             }
             tasksInfo.append(taskInfo)
         missionInfo = {
@@ -61,4 +70,7 @@ def get_mission(request):
         }
         missionInfos.append(missionInfo)
     return HttpResponse(json.dumps(missionInfos))
+
+
+
 

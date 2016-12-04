@@ -8,7 +8,7 @@ class TaskAdmin(admin.ModelAdmin):
     pass
 class TaskInline(admin.TabularInline):
     model = Task
-    filter_horizontal = ('container',)
+    filter_horizontal = ('load_container','unload_container',)
     extra = 0
 
 @admin.register(Mission)

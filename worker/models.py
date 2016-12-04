@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from worker.validators import IdCardValidator
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel, TreeForeignKey
+from django.db.models import Q
 from . import STATUS,PROFILE
+
 import datetime
 # Create your models here.
 #
@@ -54,8 +56,40 @@ class Worker(models.Model):
         return self.user.username
     def get_today_mission(self):
         today = datetime.date.today()
-        # return self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year)
-        return self.mission_set.all()
+        readyTodayMission = self.mission_set.model.objects.filter(template=False).filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year)
+        if readyTodayMission.count() == 0:
+            todayMissionTemplate = self.mission_set.model.objects.filter(template=True).filter(Q(time_start__lte = today)|Q(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year))
+            templateMissionPk = 0
+            print(todayMissionTemplate.count())
+            for m in todayMissionTemplate:
+                templateMissionPk = m.pk
+                m.pk = None
+                m.save()
+                m.template = False
+                templateMission = self.mission_set.model.objects.get(pk=templateMissionPk)
+                m.worker.add(*templateMission.worker.all())
+                m.time_start = m.time_start.replace(year = today.year, month = today.month, day = today.day)
+                m.save()
+                templateTaskPk = 0
+                for t in templateMission.task_set.all():
+                    templateTaskPk = t.pk
+                    t.pk = None
+                    t.save()
+                    templateTask = templateMission.task_set.model.objects.get(pk=templateTaskPk)
+                    t.load_container.add(*templateTask.load_container.all())
+                    t.unload_container.add(*templateTask.unload_container.all())
+                    t.misson = m
+                    t.save()
+                m.save()
+
+        returnDict = {
+            "guarder": self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
+            "watcher":'仓库管理员',
+            "driver":self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
+            "banker":"银行验收员"
+        }
+        return returnDict[self.profile]
+
     class Meta:
         verbose_name = '工作人员'
         verbose_name_plural = '工作人员'

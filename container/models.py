@@ -15,7 +15,7 @@ class Car(models.Model):
 class Container(models.Model):
     number = models.CharField('编号',max_length=20,primary_key=True)
     partment = models.ForeignKey(Partment,verbose_name="所属部门")
-    location = models.ForeignKey(Partment,verbose_name="所在地",related_name="where")
+    location = models.CharField("箱子所在地",max_length=20)
     status = models.CharField('状态',choices=STATUS,default="relaxing",max_length=20)
     def __str__(self):
         return self.number

@@ -27,12 +27,12 @@ class Mission(models.Model):
 
 
 class Task(models.Model):
-    time = models.DateTimeField('当天时间',null = True)
+    mission_time = models.DateTimeField('当天时间',null = True)
     origin = models.ForeignKey(Partment,verbose_name="起始点",related_name="origin_place",null = True)
     target = models.ForeignKey(Partment,verbose_name="目标点")
     load_container = models.ManyToManyField(Container,verbose_name="装货箱",blank=True)
     unload_container = models.ManyToManyField(Container,verbose_name="卸货箱",blank=True,related_name="unloading")
-    misson = models.ForeignKey(Mission,verbose_name="任务")
+    mission = models.ForeignKey(Mission,verbose_name="任务")
     modified = models.DateTimeField('状态改变时间')
     status = models.CharField('状态',choices=STATUS,max_length=10)
     order = models.SmallIntegerField('顺序', default=0)

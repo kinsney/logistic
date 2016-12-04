@@ -78,7 +78,7 @@ class Worker(models.Model):
                     templateTask = templateMission.task_set.model.objects.get(pk=templateTaskPk)
                     t.load_container.add(*templateTask.load_container.all())
                     t.unload_container.add(*templateTask.unload_container.all())
-                    t.misson = m
+                    t.mission = m
                     t.save()
                 m.save()
 

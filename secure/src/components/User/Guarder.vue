@@ -2,29 +2,25 @@
 <div id="guarder" class="ui segment stacked">
     <div class="ui pointing secondary menu dynamic">
         <a class="item active" data-tab='mission'>当前任务</a>
-        <a class="item" data-tab='container'>货箱管理</a>
     </div>
-    <div data-tab="mission" class="ui tab active">
-            {{ mission }}
-            {{ userInfo }}
-    </div>
-    <div data-tab="container" class="ui tab">
+    <div v-for="mission in missions">
+        <task :mission="mission"></task>
     </div>
 </div>
 </template>
 <script>
 // ####################押解员部分
 import ajax from '../../utils/ajax.js'
+import task from '../mission/task'
 export default {
   name: 'guarder',
   data () {
     return {
-        wsSocket:{},
-        misson_port:"/task/get_misson",
-        mission:{}
+        misson_port:"/task/get_mission",
+        missions:[]
     }
   },
-  props:['userInfo'],
+  props:['userInfo',"port"],
   methods : {
 
   },
@@ -32,9 +28,12 @@ export default {
     let port = this.port + this.misson_port
     let userInfo = this.userInfo
     ajax.post(port,userInfo).then(function(data){
-             this.mission = data
+             this.missions = data
         }.bind(this))
 
+  },
+  components:{
+    task
   }
 }
 </script>

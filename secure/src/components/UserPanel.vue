@@ -14,9 +14,9 @@
           <a class="item" @click="logout" >登出</a>
         </div>
       </div>
-        <Watcher :userInfo="userInfo" v-if="userInfo.profile =='watcher'"></Watcher>
-        <Banker :userInfo="userInfo" v-if="userInfo.profile =='banker'"></Banker>
-        <Guarder :userInfo="userInfo" v-if="userInfo.profile =='guarder'"></Guarder>
+        <Watcher :userInfo="userInfo" v-if="userInfo.profile =='watcher'" :port="port"></Watcher>
+        <Banker :userInfo="userInfo" v-if="userInfo.profile =='banker'" :port="port"></Banker>
+        <Guarder :userInfo="userInfo" v-if="userInfo.profile =='guarder'" :port="port"></Guarder>
         <Driver :userInfo="userInfo" v-if="userInfo.profile =='driver'" :port="port"></Driver>
     </div>
 </template>

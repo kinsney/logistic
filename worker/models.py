@@ -23,7 +23,7 @@ class Partment(MPTTModel):
         return child.lft > self.lft and child.rght < self.rght
     def __str__(self):
         if self.parent:
-            return "{}{}".format(self.parent,self.name)
+            return "{}-{}".format(self.parent,self.name)
         else :
             return self.name
     class Meta:
@@ -60,7 +60,6 @@ class Worker(models.Model):
         if readyTodayMission.count() == 0:
             todayMissionTemplate = self.mission_set.model.objects.filter(template=True).filter(Q(time_start__lte = today)|Q(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year))
             templateMissionPk = 0
-            print(todayMissionTemplate.count())
             for m in todayMissionTemplate:
                 templateMissionPk = m.pk
                 m.pk = None

@@ -32,21 +32,14 @@ def get_mission(request):
             load_containers = task.load_container.all()
             load_containersInfo = []
             for load_container in load_containers:
-                load_containerInfo = {
-                    "number":load_container.number,
-                }
-                load_containersInfo.append(load_containerInfo)
+                load_containersInfo.append(load_container.number)
             unload_containers = task.unload_container.all()
             unload_containersInfo = []
             for unload_container in unload_containers:
-                unload_containerInfo = {
-                    "number":unload_container.number,
-                }
-                unload_containersInfo.append(unload_containerInfo)
+                unload_containersInfo.append(unload_container.number)
             taskInfo = {
-                "origin":task.origin.name,
-                "target":task.target.name,
-                #"parent":task.target.parent.name,
+                "origin":task.origin.__str__(),
+                "target":task.target.__str__(),
                 "status":task.status,
                 "load_containers":load_containersInfo,
                 "unload_containers":unload_containersInfo

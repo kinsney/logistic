@@ -61,7 +61,7 @@ app.use(staticPath, express.static('./static'))
 
 var httpserver = new http.Server();
 var WebSocketServer = ws.Server
-wss = new WebSocketServer({port:7070});
+wss = new WebSocketServer({port:7000});
 
 wss.on("connection", function(socket) {
     socket.send("connected");

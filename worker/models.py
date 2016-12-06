@@ -69,6 +69,7 @@ class Worker(models.Model):
                 templateMission = self.mission_set.model.objects.get(pk=templateMissionPk)
                 m.worker.add(*templateMission.worker.all())
                 m.time_start = m.time_start.replace(year = today.year, month = today.month, day = today.day)
+                m.time_end = m.time_end.replace(year = today.year, month = today.month, day = today.day)
                 m.save()
                 templateTaskPk = 0
                 for t in templateMission.task_set.all():
@@ -84,7 +85,7 @@ class Worker(models.Model):
 
         returnDict = {
             "guarder": self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
-            "watcher":'仓库管理员',
+            "watcher":self.partment.task_set.filter(mission__time_start__day=today.day,mission__time_start__month=today.month,mission__time_start__year=today.year),
             "driver":self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
             "banker":"银行验收员"
         }

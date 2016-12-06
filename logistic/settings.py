@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-SITE_URL = "http://10.0.1.22:7000"
+SITE_URL = "http://localhost:8000"
 
 # Application definition
 

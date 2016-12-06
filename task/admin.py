@@ -23,6 +23,6 @@ class MissonAdmin(admin.ModelAdmin):
     time_end_str.short_description = "任务结束时间"
     search_fields = ['car']
     inlines = (TaskInline,)
-    list_display = ('__str__','time_start_str','time_end_str')
+    list_display = ('__str__','time_start_str','car','template')
     filter_horizontal = ('worker',)
 

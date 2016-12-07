@@ -2,3 +2,7 @@ dist/
 node_modules/
 .Ds_Store
 npm-debug.log
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class

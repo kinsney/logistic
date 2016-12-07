@@ -18,7 +18,7 @@ class Container(models.Model):
     location = models.CharField("箱子所在地",max_length=20)
     status = models.CharField('状态',choices=STATUS,default="relaxing",max_length=20)
     def __str__(self):
-        return self.number
+        return '{}-{}'.format(self.number,self.partment)
     class Meta:
         verbose_name = '货箱'
         verbose_name_plural = '货箱'

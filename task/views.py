@@ -4,15 +4,15 @@ from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from task.models import Task
 import json
 import logging
 logger = logging.getLogger("django")
 @csrf_exempt
-def get_mission(request):
+def get_mission_driver(request):
     user = User.objects.get(username=request.POST["phone"])
     missions = user.worker.get_today_mission()
     missionInfos = []
-    #print(missions)
     for mission in missions:
         guarders = mission.worker.filter(profile="guarder")
         driver = mission.worker.get(profile="driver")
@@ -38,8 +38,8 @@ def get_mission(request):
             for unload_container in unload_containers:
                 unload_containersInfo.append(unload_container.number)
             taskInfo = {
+                "task_pk":task.pk,
                 "origin":task.origin.__str__(),
-                "target":task.target.__str__(),
                 "status":task.status,
                 "load_containers":load_containersInfo,
                 "unload_containers":unload_containersInfo
@@ -59,11 +59,85 @@ def get_mission(request):
             "guarders":guardersInfo,
             "time_start":mission.time_start.strftime("%Y-%m-%d %H:%M:%S"),
             "time_end":mission.time_end.strftime("%Y-%m-%d %H:%M:%S"),
-            "tasksInfo":tasksInfo
+            "tasksInfo":tasksInfo,
+            "current_task":mission.current_task,
+            "mission_pk":mission.pk
         }
         missionInfos.append(missionInfo)
     return HttpResponse(json.dumps(missionInfos))
 
+@csrf_exempt
+def get_mission_watcher(request):
+    user = User.objects.get(username=request.POST["phone"])
+    tasks = user.worker.get_today_mission()
+    taskInfos = []
+    for t in tasks:
+        guarders = t.mission.worker.filter(profile="guarder")
+        driver = t.mission.worker.get(profile="driver")
+        car = t.mission.car
+        guardersInfo = []
+        for guarder in guarders:
+            guarderInfo = {
+                "name":guarder.name,
+                "workerId":guarder.workerId,
+                "avatar":settings.SITE_URL + guarder.avatar.url,
+                "phone":guarder.user.username
+            }
+            guardersInfo.append(guarderInfo)
 
+        load_containers = t.load_container.all()
+        load_containersInfo = []
+        for load_container in load_containers:
+            load_containersInfo.append(load_container.number)
 
+        unload_containers = t.unload_container.all()
+        unload_containersInfo = []
+        for unload_container in unload_containers:
+            unload_containersInfo.append(unload_container.number)
+        taskInfo = {
+                "task_pk":t.pk,
+                "origin":t.origin.name,
+                "status":t.status,
+                "order":t.order,
+                "start_time":t.mission.time_start.strftime("%Y-%m-%d %H:%M:%S"),
+                "end_time":t.mission.time_end.strftime("%Y-%m-%d %H:%M:%S"),
+                "load_containers":load_containersInfo,
+                "unload_containers":unload_containersInfo
+            }
+        missionInfo = {
+            "car":{
+                "license":car.license,
+                "status":car.status
+            },
+            "driver":{
+                "name":driver.name,
+                "workerId":driver.workerId,
+                "avatar":settings.SITE_URL + driver.avatar.url,
+                "phone":driver.user.username
+            },
+            "guarders":guardersInfo,
+            "taskInfo":taskInfo
+        }
+        taskInfos.append(missionInfo)
+    return HttpResponse(json.dumps(taskInfos))
 
+@csrf_exempt
+def update_task_driver_load(request):
+    task = Task.objects.get(pk=34)
+    task.toload_containers()
+
+@csrf_exempt
+def update_task_driver_unload(request):
+    task = Task.objects.get(pk=35)
+    task.tounload_containers()
+    return HttpResponse("unload")
+
+@csrf_exempt
+def update_task_watcher_push(request):
+    task = Task.objects.get(pk=34)
+    task.push_containers()
+
+@csrf_exempt
+def update_task_watcher_receive(request):
+    task = Task.objects.get(pk=34)
+    task.receive_containers()

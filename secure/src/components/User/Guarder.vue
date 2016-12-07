@@ -4,19 +4,19 @@
         <a class="item active" data-tab='mission'>当前任务</a>
     </div>
     <div v-for="mission in missions">
-        <task :mission="mission"></task>
+        <mission :mission="mission"></mission>
     </div>
 </div>
 </template>
 <script>
 // ####################押解员部分
 import ajax from '../../utils/ajax.js'
-import task from '../mission/task'
+import mission from '../mission/mission'
 export default {
   name: 'guarder',
   data () {
     return {
-        misson_port:"/task/get_mission",
+        misson_port:"/task/get_mission_driver",
         missions:[]
     }
   },
@@ -33,7 +33,7 @@ export default {
 
   },
   components:{
-    task
+    mission
   }
 }
 </script>

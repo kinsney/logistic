@@ -4,7 +4,7 @@
         <a class="item active">当日任务</a>
     </div>
     <div v-for="mission in missions">
-        <task :mission="mission"></task>
+        <mission :mission="mission"></mission>
     </div>
 </div>
 
@@ -12,12 +12,12 @@
 <script>
 // ####################银行管理员部分
 import ajax from '../../utils/ajax.js'
-import task from '../mission/task'
+import mission from '../mission/mission'
 export default {
   name: 'driver',
   data () {
     return {
-        misson_port:"/task/get_mission",
+        misson_port:"/task/get_mission_driver",
         missions:[],
     }
   },
@@ -33,7 +33,7 @@ export default {
         }.bind(this))
   },
   components:{
-    task
+    mission
   }
 }
 </script>

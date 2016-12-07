@@ -1,7 +1,6 @@
 <template>
-    <div class="task">
-        <h4 class="header ui orange block top attached" v-html="task.taskInfo.start_time" v-if="task.taskInfo.order==0"></h4>
-        <h4 class="header ui orange block top attached" v-html="task.taskInfo.end_time" v-if="task.taskInfo.order!=0"></h4>
+    <div class="job">
+        <h4 class="header ui orange block top attached" v-html="task.taskInfo.start_time"></h4>
         <div class="ui attached segment bottom">
             <div class="ui grid">
                 <div class="five wide column">
@@ -21,7 +20,9 @@
                                     <h4 class="ui image header">
                                         <img :src="task.driver.avatar" class="ui mini rounded image">
                                         <div class="content">{{ task.driver.name }}</div>
-                                        <div class="description">{{ task.driver.workerId }}</div>
+                                        <div class="description">
+                                            {{ task.driver.workerId}}
+                                        </div>
                                     </h4>
                                 </td>
                             </tr>
@@ -31,7 +32,9 @@
                                     <h4 class="ui image header" v-for="guarder in task.guarders">
                                         <img :src="guarder.avatar" class="ui mini rounded image">
                                         <div class="content">{{ guarder.name }}</div>
-                                        <div class="description">{{ guarder.workerId }}</div>
+                                        <div class="description">
+                                            {{ guarder.workerId}}
+                                        </div>
                                     </h4>
                                 </td>
                             </tr>
@@ -42,29 +45,25 @@
             <div class="eleven wide column">
                 <div class="ui segment">
                     {{ task }}
-                    <div class="ui form" v-if="task.taskInfo.order==0">
-                        <h4 class="ui dividing header">出货箱</h4>
-                        <div class="inline field" v-for="container in task.taskInfo.load_containers">
-                            <div class="ui checkbox" >
-                                <input type="checkbox" tabindex="0" class="hidden">
-                                <label>箱子编号：{{ container }}</label>
+                    <div class="ui form">
+                        <div class="two fields">
+                            <div class="field">
+                                <h4 class="ui dividing header">接收货箱</h4>
+                                <div class="inline field" v-for="container in task.taskInfo.unload_containers">
+                                    <div class="ui checkbox" >
+                                        <input type="checkbox" tabindex="0" class="hidden">
+                                        <label>箱子编号：{{ container }}</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="inline field">
-                            <div class="ui button  primary" @click="nextStep">
-                                确认
-                            </div>
-                            <div class="ui button right floated negative button">
-                                报警
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ui form" v-if="task.taskInfo.order!=0">
-                        <h4 class="ui dividing header">收货箱</h4>
-                        <div class="inline field" v-for="container in task.taskInfo.unload_containers">
-                            <div class="ui checkbox" >
-                                <input type="checkbox" tabindex="0" class="hidden">
-                                <label>箱子编号：{{ container }}</label>
+                            <div class="field">
+                                <h4 class="ui dividing header">运出货箱</h4>
+                                <div class="inline field" v-for="container in task.taskInfo.load_containers">
+                                    <div class="ui checkbox" >
+                                        <input type="checkbox" tabindex="0" class="hidden">
+                                        <label>箱子编号：{{ container }}</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="inline field">
@@ -84,7 +83,7 @@
 <script>
 // ####################出勤任务部分
 export default {
-  name: 'task',
+  name: 'bankjob',
   data () {
     return {
         containers:[]

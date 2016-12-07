@@ -29,8 +29,8 @@ class Mission(models.Model):
         if order_num > 0:
             last_task = self.task_set.filter(order = (order_num-1))
             if last_task.count() == 1 :
-                if last_task[0].status == "load":
-                    last_task[0].status = "done"
+                if last_task[0].status == "done":
+                    last_task[0].status = "finish"
                     last_task[0].save()
 
 
@@ -42,7 +42,7 @@ class Mission(models.Model):
 class Task(models.Model):
     mission_time = models.DateTimeField('当天时间',null = True)
     origin = models.ForeignKey(Partment,verbose_name="起始点",null = True)
-    target = models.ForeignKey(Partment,verbose_name="目标点",related_name="target_place")
+    #target = models.ForeignKey(Partment,verbose_name="目标点",related_name="target_place")
     load_container = models.ManyToManyField(Container,verbose_name="装货箱",blank=True)
     unload_container = models.ManyToManyField(Container,verbose_name="卸货箱",blank=True,related_name="unloading")
     mission = models.ForeignKey(Mission,verbose_name="任务")
@@ -50,41 +50,42 @@ class Task(models.Model):
     status = models.CharField('状态',choices=STATUS,max_length=10)
     order = models.SmallIntegerField('顺序', default=0)
     def __str__(self):
-        return "由{}送向{}".format(self.origin,self.target)
+        return "由{}出发".format(self.origin)
 
-    def toload_containers(self):
-        if self.status == "push":
+    def load_containers(self):
+        if self.status == "failed":
             for c in self.load_container.all():
                 c.location = self.mission.car.license
                 c.save()
+            for c in self.unload_container.all():
+                c.location = "from"+self.mission.car.license + "to" +self.origin.name
+                c.save()
             self.status = "load"
+            self.mission.update_current_task(self.order)
+            self.save()
+        if self.status == "receive":
+            for c in self.load_container.all():
+                c.location = self.mission.car.license
+                c.save()
+            self.status = "done"
             self.save()
 
-    def tounload_containers(self):
-        print(self.status)
-        if self.status == "failed":
-            for c in self.unload_container.all():
-                c.location = self.mission.car.license + "to" +self.origin.name
-                c.save()
-            self.status = "unload"
-            self.modified = datetime.datetime.now()
-            self.save()
-            self.mission.update_current_task(self.order)
 
     def receive_containers(self):
-        if self.status == "unload":
+        if self.status == "failed":
             for c in self.unload_container.all():
                 c.location = self.origin.name
                 c.save()
+            for c in self.load_container.all():
+                c.location = "from"+self.origin.name + "to" +self.mission.car.license
+                c.save() 
             self.status = "receive"
             self.save()
-
-    def push_containers(self):
-        if self.status == "receive":
-            for c in self.load_container.all():
-                c.location = self.origin.name + "to" +self.mission.car.license
-                c.save() 
-            self.status = "push"
+        if self.status == "load":
+            for c in self.unload_container.all():
+                c.location = self.origin.name
+                c.save()
+            self.status = "done"
             self.save()
 
     class Meta:

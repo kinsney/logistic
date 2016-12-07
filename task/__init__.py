@@ -1,6 +1,8 @@
 default_app_config = 'task.apps.TaskConfig'
 STATUS = (
-        ('doing','正在执行'),
-        ('done','已完成'),
-        ('failed','未完成')
+        ('receive','已入库'),
+        ('load','已装货，将前往下一个目的地'),
+        ('done','已完成，将前往下一个目的地'),
+        ('failed','未进行'),
+        ('finish','已结束')
     )

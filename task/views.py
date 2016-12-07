@@ -47,7 +47,6 @@ def get_mission_driver(request):
             taskInfo = {
                 "task_pk":task.pk,
                 "origin":task.origin.name,
-                "target":task.target.name,
                 #"parent":task.target.parent.name,
                 "status":task.status,
                 "load_containers":load_containersInfo,
@@ -134,23 +133,13 @@ def get_mission_watcher(request):
         taskInfos.append(missionInfo)
     return HttpResponse(json.dumps(taskInfos))
 
-@csrf_exempt
-def update_task_driver_load(request):
-    task = Task.objects.get(pk=34)
-    task.toload_containers()
 
 @csrf_exempt
-def update_task_driver_unload(request):
-    task = Task.objects.get(pk=35)
-    task.tounload_containers()
-    return HttpResponse("unload")
-
-@csrf_exempt
-def update_task_watcher_push(request):
-    task = Task.objects.get(pk=34)
-    task.push_containers()
-
-@csrf_exempt
-def update_task_watcher_receive(request):
-    task = Task.objects.get(pk=34)
+def update_task_watcher(request):
+    task = Task.objects.get(pk=57)
     task.receive_containers()
+
+@csrf_exempt
+def update_task_driver(request):
+    task = Task.objects.get(pk=57)
+    task.load_containers()

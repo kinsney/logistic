@@ -3,8 +3,10 @@
     <div class="ui pointing secondary menu dynamic">
         <a class="item active" data-tab='mission'>当前任务</a>
     </div>
-    <div v-for="task in tasks">
-        <bankjob :task="task"></bankjob>
+    <div class="ui tab" data-tab='mission'>
+      <div v-for="task in tasks" data-tab='mission'>
+        <bankjob :task="task" :port="port" :userInfo="userInfo"></bankjob>
+      </div>
     </div>
 </div>
 </template>
@@ -24,6 +26,7 @@ export default {
   methods : {
   },
   mounted:function(){
+    $('.menu .item').tab('change tab','mission');
     let port = this.port + this.misson_port
     let userInfo = this.userInfo
     ajax.post(port,userInfo).then(function(data){

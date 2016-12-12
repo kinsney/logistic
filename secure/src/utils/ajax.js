@@ -10,7 +10,7 @@ export class Ajax {
     this._csrfToken = this.getCsrfToken();
   }
 
-  getCsrfToken() {
+  getCsrfToken(token) {
     if (document.cookie.indexOf(this._cookieName) !== -1) {
       let cookieRegex = new RegExp(this._cookieName + '\=([^;]*)');
       let cookie = document.cookie.match(cookieRegex)[0];

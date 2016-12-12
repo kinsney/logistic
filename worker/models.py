@@ -56,7 +56,7 @@ class Worker(models.Model):
         return self.user.username
     def get_today_mission(self):
         today = datetime.date.today()
-        readyTodayMission = self.mission_set.model.objects.filter(template=False).filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year)
+        readyTodayMission = self.mission_set.model.objects.filter(template=False,time_start__day=today.day,time_start__month=today.month,time_start__year=today.year)
         if readyTodayMission.count() == 0:
             todayMissionTemplate = self.mission_set.model.objects.filter(template=True).filter(Q(time_start__lte = today)|Q(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year))
             templateMissionPk = 0
@@ -78,15 +78,16 @@ class Worker(models.Model):
                     templateTask = templateMission.task_set.model.objects.get(pk=templateTaskPk)
                     t.load_container.add(*templateTask.load_container.all())
                     t.unload_container.add(*templateTask.unload_container.all())
+                    t.mission_time = t.mission_time.replace(year = today.year, month = today.month, day = today.day)
                     t.mission = m
                     t.save()
                 m.save()
 
         returnDict = {
             "guarder": self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
-            "watcher":self.partment.task_set.filter(mission__time_start__day=today.day,mission__time_start__month=today.month,mission__time_start__year=today.year),
+            "watcher":self.partment.task_set.filter(mission__time_start__day=today.day,mission__time_start__month=today.month,mission__time_start__year=today.year,mission__template=False),
             "driver":self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
-            "banker":self.partment.task_set.filter(mission__time_start__day=today.day,mission__time_start__month=today.month,mission__time_start__year=today.year)
+            "banker":self.partment.task_set.filter(mission__time_start__day=today.day,mission__time_start__month=today.month,mission__time_start__year=today.year,mission__template=False)
         }
         return returnDict[self.profile]
 

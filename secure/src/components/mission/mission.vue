@@ -1,6 +1,6 @@
 <template>
 <div class="task">
-    <h4 class="header ui orange block top attached" v-html="mission.time_start"></h4>
+    <h4 class="header ui orange block top attached">任务开始时间：{{ mission.time_start}}</h4>
     <div class="ui attached segment bottom">
         <div class="ui grid">
             <div class="five wide column">
@@ -20,7 +20,7 @@
                                     <h4 class="ui image header">
                                         <img :src="mission.driver.avatar" class="ui mini rounded image">
                                         <div class="content">{{ mission.driver.name }}</div>
-                                        <div class="description">{{ mission.driver.workerId }}</div>
+                                        <div class="description">工号：{{ mission.driver.workerId }}</div>
                                     </h4>
                                 </td>
                             </tr>
@@ -30,7 +30,7 @@
                                     <h4 class="ui image header" v-for="guarder in mission.guarders">
                                         <img :src="guarder.avatar" class="ui mini rounded image">
                                         <div class="content">{{ guarder.name }}</div>
-                                        <div class="description">{{ guarder.workerId }}</div>
+                                        <div class="description">工号：{{ guarder.workerId }}</div>
                                     </h4>
                                 </td>
                             </tr>
@@ -60,7 +60,6 @@
                     </div>
                     <div class="ui attached segment panel">
                         <div v-for="(task,index) in mission.tasksInfo" v-if="current == index">
-                            {{ task }}
                             <div class="ui form">
                                 <h4 class="ui dividing header">车上的箱子：</h4>
                                 <div class="inline field" v-for="container in containers">
@@ -90,7 +89,7 @@
                                     </div>
                                 </div>
                                 <div class="inline field">
-                                    <div class="ui button  primary" @click="nextStep">
+                                    <div class="ui button  primary " @click="update">
                                         确认
                                     </div>
                                     <div class="ui button right floated negative button">
@@ -99,7 +98,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div v-if="current==steps">
+                            <div class="ui success message visible" >
+                              <div class="header">该任务已完成</div>
+                              <p>该车辆已完成押送货物及回收货物</p>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div>
                 </div>
             </div>
         </div>
@@ -109,12 +116,15 @@
 </template>
 <script>
 // ####################出勤任务部分
+import ajax from '../../utils/ajax.js'
 export default {
   name: 'taskOut',
   data () {
     return {
-        current:"0",
-        containers:[]
+        current:0,
+        update_port:'/task/update_task_driver',
+        containers:[],
+        openDevice:false
     }
   },
   computed:{
@@ -122,31 +132,44 @@ export default {
         return this.mission.tasksInfo.length
     }
   },
-
-  props:['mission'],
+  props:['mission',"port","userInfo"],
   methods : {
     desName (value,index){
         return value.split('-')[index]
     },
     nextStep (){
-        let i = Number(this.current)
+        let i = this.current
         let load = this.mission.tasksInfo[i].load_containers
         let unload = this.mission.tasksInfo[i].unload_containers
         this.containers = this.containers.concat(load).filter((item) => !(unload.indexOf(item)>=0))
-       this.current = Number(this.current)+1+""
+       this.current = this.current+1
+    },
+    update(){
+        let port = this.port + this.update_port
+        let phone = this.userInfo.phone
+        let task_pk = this.mission.tasksInfo[this.current].task_pk
+        let data = {"phone":phone,"task_pk":task_pk}
+        ajax.post(port,data).then(function(data){
+             this.nextStep()
+        }.bind(this))
+    },
+    start(){
+
     }
   },
   watch:{
   },
   mounted:function(){
     $('.ui.checkbox').checkbox()
-    let index = Number(this.current)
-    for(var i=0;i<index;i++){
+    $('.ui.accordion')
+  .accordion()
+;
+    this.current = this.mission.current_task
+    for(var i=0;i<this.current;i++){
         let load = this.mission.tasksInfo[i].load_containers
         let unload = this.mission.tasksInfo[i].unload_containers
-        this.containers = this.containers.concat(load).filter((item) => (unload.indexOf(item)>=0));
+        this.containers = this.containers.concat(load).filter((item) => !(unload.indexOf(item)>=0));
     }
-
   }
 }
 </script>

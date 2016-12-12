@@ -11,7 +11,7 @@ logger = logging.getLogger("django")
 @csrf_exempt
 def get_mission_driver(request):
     user = User.objects.get(username=request.POST["phone"])
-    missions = user.worker.get_today_mission()
+    missions = user.worker.get_today_mission().order_by('time_start')
     missionInfos = []
     for mission in missions:
         guarders = mission.worker.filter(profile="guarder")
@@ -69,7 +69,7 @@ def get_mission_driver(request):
 @csrf_exempt
 def get_mission_watcher(request):
     user = User.objects.get(username=request.POST["phone"])
-    tasks = user.worker.get_today_mission()
+    tasks = user.worker.get_today_mission().order_by('mission_time')
     taskInfos = []
     for t in tasks:
         guarders = t.mission.worker.filter(profile="guarder")
@@ -99,7 +99,7 @@ def get_mission_watcher(request):
                 "origin":t.origin.name,
                 "status":t.status,
                 "order":t.order,
-                "start_time":t.mission.time_start.strftime("%Y-%m-%d %H:%M:%S"),
+                "start_time":t.mission_time.strftime("%Y-%m-%d %H:%M:%S"),
                 "end_time":t.mission.time_end.strftime("%Y-%m-%d %H:%M:%S"),
                 "load_containers":load_containersInfo,
                 "unload_containers":unload_containersInfo
@@ -121,23 +121,25 @@ def get_mission_watcher(request):
         taskInfos.append(missionInfo)
     return HttpResponse(json.dumps(taskInfos))
 
-@csrf_exempt
-def update_task_driver_load(request):
-    task = Task.objects.get(pk=34)
-    task.toload_containers()
 
 @csrf_exempt
-def update_task_driver_unload(request):
-    task = Task.objects.get(pk=35)
-    task.tounload_containers()
-    return HttpResponse("unload")
-
-@csrf_exempt
-def update_task_watcher_push(request):
-    task = Task.objects.get(pk=34)
-    task.push_containers()
-
-@csrf_exempt
-def update_task_watcher_receive(request):
-    task = Task.objects.get(pk=34)
+def update_task_watcher(request):
+    user = User.objects.get(username=request.POST["phone"])
+    pk = request.POST['task_pk']
+    task = Task.objects.get(pk=pk)
     task.receive_containers()
+    status = {"status":task.status}
+    return HttpResponse(json.dumps(status))
+
+@csrf_exempt
+def update_task_driver(request):
+    try:
+        user = User.objects.get(username=request.POST["phone"])
+        pk = request.POST['task_pk']
+        task = Task.objects.get(pk=pk)
+        task.load_containers()
+        return HttpResponse(200)
+    except:
+        return HttpResponseForbidden()
+
+

@@ -1,0 +1,85 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static %}
+{% load floor %}
+{% block object-tools %}
+    {{ block.super }}
+    {% if not mission.template %}
+    <link rel="stylesheet" href="{% static "semantic/components/step.min.css" %}">
+    <link rel="stylesheet" href="{% static "semantic/components/segment.min.css" %}">
+    <link rel="stylesheet" href="{% static "semantic/components/header.min.css" %}">
+    <link rel="stylesheet" href="{% static "semantic/components/icon.min.css" %}">
+    <link rel="stylesheet" href="{% static "semantic/components/form.min.css" %}">
+    <link rel="stylesheet" href="{% static "semantic/components/message.min.css" %}">
+    <style>
+        .task *{
+            box-sizing: border-box;
+        }
+    </style>
+    <script href="{% static "semantic/semantic.min.js"%}"></script>
+    <div class="task">
+        <h4 class="header ui top attached inverted">任务进展</h4>
+        <div class="ui segment attached">
+            <div class="ui steps mini stackable attached">
+                {% for task in mission.task_set.all %}
+                    <div class="step {% if mission.current_task == task.order %}active{% endif %}
+                    {% if task.status == 'load' or task.status == 'done' %}completed{% endif %}">
+                        <i class="truck icon"></i>
+                        <div class="content">
+                              <div class="title">{{ task.origin |floor:1 }}</div>
+                              <div class="description">{{ task.origin |floor:0 }}</div>
+                              <div class="description">押运车装卸货</div>
+                        </div>
+                    </div>
+                    <div class="step {% if mission.current_task == task.order%}active{% endif %}
+                    {% if task.status == 'receive' or task.status == 'done' %}completed{% endif %}">
+                        <i class="cubes icon"></i>
+                        <div class="content">
+                              <div class="title">{{ task.origin |floor:1 }}</div>
+                              <div class="description">{{ task.origin |floor:0 }}</div>
+                              <div class="description">确认收发货</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="ui attached segment">
+                {% for task in mission.task_set.all %}
+                    {% if mission.current_task == task.order %}
+                    <div class="ui form">
+                        <div class="two fields">
+                            <div class="field">
+                                <h4 class="ui dividing header">需要装箱/出库：</h4>
+                                {% for container in task.load_container.all %}
+                                <div class="inline field">
+                                    <div class="ui checkbox" >
+                                        <input type="checkbox" tabindex="0" class="hidden">
+                                        <label>箱子编号：{{ container }}</label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="field">
+                                <h4 class="ui dividing header">需要卸箱/入库：</h4>
+                                {% for container in task.unload_container.all %}
+                                <div class="inline field">
+                                    <div class="ui checkbox" >
+                                        <input type="checkbox" tabindex="0" class="hidden">
+                                        <label>箱子编号：{{ container }}</label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {% if mission.current_task == mission.task_set.all.count %}
+                            <div class="ui success message visible" >
+                              <div class="header">押运任务已完成</div>
+                              <p>该车辆已完成押送货物及回收货物</p>
+                            </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif%}
+{% endblock %}

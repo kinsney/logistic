@@ -32,6 +32,10 @@ SITE_URL = "http://localhost:8000"
 # Application definition
 
 INSTALLED_APPS = [
+    'worker',
+    'container',
+    'task',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,10 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'worker',
-    'container',
-    'task',
-    'corsheaders',
 ]
 
 MIDDLEWARE_CLASSES = [

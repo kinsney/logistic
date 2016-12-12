@@ -1,17 +1,17 @@
 <template>
     <div id="userPanel" class="ui container">
-      <div class="ui menu">
+      <div class="ui menu inverted teal">
         <div class="header item">
           {{ userInfo.partment }}
         </div>
         <a class="item">
-          操作员：{{ userInfo.name }}
+          {{ defineProfile(userInfo.profile)}}：{{ userInfo.name }}
         </a>
         <a class="item">
           工号：{{ userInfo.workerId }}
         </a>
         <div class="right menu">
-          <a class="item" @click="logout" >登出</a>
+          <a class="item" @click="logout" ><i class="ui icon sign out"></i>登出</a>
         </div>
       </div>
         <Watcher :userInfo="userInfo" v-if="userInfo.profile =='watcher'" :port="port"></Watcher>
@@ -37,6 +37,15 @@ export default {
   methods : {
     logout:function(){
       this.$emit('logout')
+    },
+    defineProfile(profile){
+      let mapping = {
+        "driver":"司机",
+        "banker":"银行验收员",
+        "guarder":"押解员",
+        "watcher":"仓库管理员"
+      }
+      return mapping[profile]
     }
   },
   components: {

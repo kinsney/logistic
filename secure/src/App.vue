@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div id="app">
     <Login v-on:finishLogin="getUserInfo" :userInfo="userInfo" v-if="!userInfo" :port="port"></Login>
     <UserPanel :userInfo="userInfo" v-if="userInfo" v-on:logout="logout" :port="port"></UserPanel>

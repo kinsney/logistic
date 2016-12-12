@@ -4,7 +4,7 @@
         <a class="item active">当日任务</a>
     </div>
     <div v-for="mission in missions">
-        <mission :mission="mission"></mission>
+        <mission :mission="mission" :port="port" :userInfo="userInfo"></mission>
     </div>
 </div>
 

@@ -45,6 +45,8 @@ export default {
         let username = this.username
         let password = this.password
         let data = {"username":username,"password":password}
+        ajax.init('csrftoken')
+        let csrftoken = ajax._csrfToken
         ajax.post(port,data).then(function(data){
              this.$emit('finishLogin',data)
         }.bind(this))

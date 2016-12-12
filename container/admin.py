@@ -5,6 +5,7 @@ from .models import Container,Car
 class ContainerAdmin(admin.ModelAdmin):
     search_fields = ['number','partment','location']
     list_display = ('number','partment','location','status')
+    list_filter = ('partment','location','status')
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):

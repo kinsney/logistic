@@ -4,7 +4,7 @@
         <a class="item active" data-tab='mission'>当前任务</a>
     </div>
     <div v-for="task in tasks">
-        <task :task="task"></task>
+        <task :task="task" :port="port" :userInfo="userInfo"></task>
     </div>
 </div>
 </template>

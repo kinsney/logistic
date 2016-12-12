@@ -1,6 +1,6 @@
 <template>
     <div class="job">
-        <h4 class="header ui orange block top attached" v-html="task.taskInfo.start_time"></h4>
+        <h4 class="header ui orange block top attached">任务开始时间：{{task.taskInfo.start_time}}</h4>
         <div class="ui attached segment bottom">
             <div class="ui grid">
                 <div class="five wide column">
@@ -21,7 +21,7 @@
                                         <img :src="task.driver.avatar" class="ui mini rounded image">
                                         <div class="content">{{ task.driver.name }}</div>
                                         <div class="description">
-                                            {{ task.driver.workerId}}
+                                            工号：{{ task.driver.workerId}}
                                         </div>
                                     </h4>
                                 </td>
@@ -33,7 +33,7 @@
                                         <img :src="guarder.avatar" class="ui mini rounded image">
                                         <div class="content">{{ guarder.name }}</div>
                                         <div class="description">
-                                            {{ guarder.workerId}}
+                                            工号：{{ guarder.workerId}}
                                         </div>
                                     </h4>
                                 </td>
@@ -44,7 +44,6 @@
             </div>
             <div class="eleven wide column">
                 <div class="ui segment">
-                    {{ task }}
                     <div class="ui form">
                         <div class="two fields">
                             <div class="field">
@@ -66,13 +65,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="inline field">
-                            <div class="ui button  primary">
+                        <div class="inline field" v-if="status=='failed'||status=='load'">
+                            <div class="ui button  primary" @click="update">
                                 确认
                             </div>
                             <div class="ui button right floated negative button">
                                 报警
                             </div>
+                        </div>
+                        <div class="ui success message visible" v-else >
+                              <div class="header">该任务已完成</div>
+                              <p>该网点已收到货物、或者回收货物</p>
                         </div>
                     </div>
                 </div>
@@ -82,23 +85,37 @@
 </template>
 <script>
 // ####################出勤任务部分
+import ajax from '../../utils/ajax.js'
 export default {
   name: 'bankjob',
   data () {
     return {
-        containers:[]
+        containers:[],
+        update_port:'/task/update_task_watcher',
+        openDevice:false,
+        status:""
     }
   },
   computed:{
   },
 
-  props:['task'],
+  props:['task',"port","userInfo"],
   methods : {
+    update(){
+        let port = this.port + this.update_port
+        let phone = this.userInfo.phone
+        let task_pk = this.task.taskInfo.task_pk
+        let data = {"phone":phone,"task_pk":task_pk}
+        ajax.post(port,data).then(function(data){
+            this.status = data.status
+        }.bind(this))
+    }
   },
   watch:{
   },
   mounted:function(){
     $('.ui.checkbox').checkbox()
+    this.status = this.task.taskInfo.status
   }
 }
 </script>

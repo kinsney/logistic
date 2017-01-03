@@ -1,16 +1,17 @@
 <template>
 <div id="driver" class="ui segment stacked">
     <div class="ui pointing secondary menu dynamic">
-        <a class="item active">当日任务</a>
+        <a class="item" :data-tab="'mission'+index" v-for="(mission,index) in missions" v-if="mission.current_task==mission.tasksInfo.length">任务{{index+1}}（完成）</a>
+        <a class="item" :data-tab="'mission'+index" v-for="(mission,index) in missions" v-if="mission.current_task!=mission.tasksInfo.length">任务{{index+1}}</a>
     </div>
-    <div v-for="mission in missions">
-        <mission :mission="mission" :port="port" :userInfo="userInfo"></mission>
+    <div v-for="(mission,index) in missions" class="ui tab" :data-tab="'mission'+index">
+        <mission :mission="mission" :port="port" :userInfo="userInfo" :missionId="index"></mission>
     </div>
 </div>
 
 </template>
 <script>
-// ####################银行管理员部分
+// ####################司机部分
 import ajax from '../../utils/ajax.js'
 import mission from '../mission/mission'
 export default {
@@ -30,7 +31,9 @@ export default {
     let port = this.port + this.misson_port
     ajax.post(port,userInfo).then(function(data){
              this.missions = data
-        }.bind(this))
+        }.bind(this)).then(function(){
+          $('.menu .item').tab('change tab','mission0');
+        })
   },
   components:{
     mission

@@ -1,5 +1,5 @@
 <template>
-    <div class="job">
+    <div>
         <h4 class="header ui orange block top attached">任务开始时间：{{task.taskInfo.start_time}}</h4>
         <div class="ui attached segment bottom">
             <div class="ui grid">
@@ -44,12 +44,12 @@
             </div>
             <div class="eleven wide column">
                 <div class="ui segment">
-                    <div class="ui form">
+                    <div class="ui form" :id="'bankjob'+bankjobId">
                         <div class="two fields">
                             <div class="field">
                                 <h4 class="ui dividing header">接收货箱</h4>
                                 <div class="inline field" v-for="container in task.taskInfo.unload_containers">
-                                    <div class="ui checkbox" >
+                                    <div class="ui checkbox disabled" :class="container" >
                                         <input type="checkbox" tabindex="0" class="hidden">
                                         <label>箱子编号：{{ container }}</label>
                                     </div>
@@ -58,7 +58,7 @@
                             <div class="field">
                                 <h4 class="ui dividing header">运出货箱</h4>
                                 <div class="inline field" v-for="container in task.taskInfo.load_containers">
-                                    <div class="ui checkbox" >
+                                    <div class="ui checkbox disabled" :class="container">
                                         <input type="checkbox" tabindex="0" class="hidden">
                                         <label>箱子编号：{{ container }}</label>
                                     </div>
@@ -66,7 +66,10 @@
                             </div>
                         </div>
                         <div class="inline field" v-if="status=='failed'||status=='load'">
-                            <div class="ui button  primary" @click="update">
+                            <div class="ui button basic" @click="start" v-if="!missionStart">
+                                任务开始
+                            </div>
+                            <div class="ui button primary" @click="update" v-if="missionStart" :class="{disabled:!allchecked}" >
                                 确认
                             </div>
                             <div class="ui button right floated negative button">
@@ -75,7 +78,7 @@
                         </div>
                         <div class="ui success message visible" v-else >
                               <div class="header">该任务已完成</div>
-                              <p>该网点已收到货物、或者回收货物</p>
+                              <p>网点已完成货箱的接收及运出</p>
                         </div>
                     </div>
                 </div>
@@ -90,16 +93,17 @@ export default {
   name: 'bankjob',
   data () {
     return {
-        containers:[],
         update_port:'/task/update_task_watcher',
         openDevice:false,
-        status:""
+        status:"",
+        missionStart:false,
+        allchecked:false,
+        socket:null,
     }
   },
   computed:{
   },
-
-  props:['task',"port","userInfo"],
+  props:['task',"port","userInfo","bankjobId"],
   methods : {
     update(){
         let port = this.port + this.update_port
@@ -108,8 +112,29 @@ export default {
         let data = {"phone":phone,"task_pk":task_pk}
         ajax.post(port,data).then(function(data){
             this.status = data.status
+            this.socket.close()
         }.bind(this))
-    }
+    },
+    start (){
+        this.socket = new WebSocket("ws://localhost:5000");
+        this.socket.onmessage = function(event){
+            if(this.missionStart){
+                let bankjob = 'bankjob'+this.bankjobId
+                let $checkbox = $('#'+bankjob).find('.checkbox')
+                let allchecked = this.allchecked
+                let containerNumber = event.data
+                allchecked = true
+                $('#'+bankjob).find('.checkbox.'+containerNumber).checkbox('check')
+                  $checkbox.each(function(){
+                        if(!$(this).checkbox('is checked')){
+                            allchecked = false
+                        }
+                    })
+                this.allchecked = allchecked
+            }
+        }.bind(this)
+        this.missionStart = true
+      }
   },
   watch:{
   },

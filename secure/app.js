@@ -1,31 +1,59 @@
 const electron = require('electron')
 // Module to control application life.
 const app = electron.app
+const { Menu,MenuItem } = electron
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
 const url = require('url')
 
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
-
+const port = 3000
+const remote = 'http://localhost:7000'
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  app.name = "安保系统"
+  mainWindow = new BrowserWindow({width: 1200, height: 800})
 
   // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'dist/index.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
+  mainWindow.loadURL('http://localhost:'+port)
+  const template = [
+    {
+        submenu:[
+          {
+            label:"退出系统",
+            role:"quit"
+          }
+        ]
+    },
+    {
+      label:"切换系统",
+      submenu:[
+      {
+        label:"进入用户系统",
+        click(){
+          mainWindow.loadURL('http://localhost:'+port)
+        }
+      },
+      {
+        type:'separator'
+      },
+      {
+        label:"进入管理系统",
+        click(){
+          mainWindow.loadURL(remote)
+        }
+      },
+      {
+        type:'separator'
+      }
+    ]}]
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
-
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
@@ -59,3 +87,19 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+var ws = require('ws');
+var express = require('express')
+var main = express();
+main.use(express.static(path.join(__dirname, 'dist')))
+var WebSocketServer = ws.Server
+wss = new WebSocketServer({port:5000});
+wss.on("connection", function(socket) {
+    socket.on("message", function(msg) {
+        wss.clients.forEach(function(client) {
+          if(client!=socket&&client.readyState===1){
+            client.send(msg)
+          }
+        });
+    });
+});
+main.listen(port)

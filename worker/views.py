@@ -11,7 +11,6 @@ import os
 import logging
 import json
 # Create your views here.
-logger = logging.getLogger("django")
 def login_required(view):
     def wrapped_view(request, *args, **kwargs):
         if request.user.is_authenticated():

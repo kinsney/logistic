@@ -58,30 +58,30 @@
                             </div>
                         </div>
                     </div>
-                    <div class="ui attached segment panel">
+                    <div class="ui attached segment panel" >
                         <div v-for="(task,index) in mission.tasksInfo" v-if="current == index">
                             <div class="ui form">
-                                <h4 class="ui dividing header">车上的箱子：</h4>
+                                <h4 class="ui dividing header">车上的箱子:（{{containers.length}}）</h4>
                                 <div class="inline field" v-for="container in containers">
-                                    <div class="ui checkbox" >
+                                    <div class="ui checkbox disabled inCar" :class="container">
                                         <input type="checkbox" tabindex="0" class="hidden">
                                         <label>箱子编号：{{ container }}</label>
                                     </div>
                                 </div>
-                                <div class="two fields">
+                                <div class="two fields" :class="'mission'+missionId">
                                     <div class="field">
-                                        <h4 class="ui dividing header">需要装箱：</h4>
+                                        <h4 class="ui dividing header">需要装箱:（{{task.load_containers.length}}）</h4>
                                         <div class="inline field" v-for="container in task.load_containers">
-                                            <div class="ui checkbox" >
+                                            <div class="ui checkbox disabled" :class="container">
                                                 <input type="checkbox" tabindex="0" class="hidden">
                                                 <label>箱子编号：{{ container }}</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="field">
-                                        <h4 class="ui dividing header">需要卸箱：</h4>
+                                        <h4 class="ui dividing header">需要卸箱:（{{task.unload_containers.length}}）</h4>
                                         <div class="inline field" v-for="container in task.unload_containers">
-                                            <div class="ui checkbox" >
+                                            <div class="ui checkbox disabled" :class="container">
                                                 <input type="checkbox" tabindex="0" class="hidden">
                                                 <label>箱子编号：{{ container }}</label>
                                             </div>
@@ -89,7 +89,10 @@
                                     </div>
                                 </div>
                                 <div class="inline field">
-                                    <div class="ui button  primary " @click="update">
+                                    <div class="ui button basic" @click="start" v-if="!missionStart">
+                                        任务开始
+                                    </div>
+                                    <div class="ui button  primary" @click="update" v-else :class="{disabled:!allchecked}">
                                         确认
                                     </div>
                                     <div class="ui button right floated negative button">
@@ -124,7 +127,11 @@ export default {
         current:0,
         update_port:'/task/update_task_driver',
         containers:[],
-        openDevice:false
+        openDevice:false,
+        allchecked:false,
+        socket:null,
+        missionStart:false,
+        interval:null,
     }
   },
   computed:{
@@ -132,7 +139,7 @@ export default {
         return this.mission.tasksInfo.length
     }
   },
-  props:['mission',"port","userInfo"],
+  props:['mission',"port","userInfo",'missionId'],
   methods : {
     desName (value,index){
         return value.split('-')[index]
@@ -142,7 +149,27 @@ export default {
         let load = this.mission.tasksInfo[i].load_containers
         let unload = this.mission.tasksInfo[i].unload_containers
         this.containers = this.containers.concat(load).filter((item) => !(unload.indexOf(item)>=0))
-       this.current = this.current+1
+        this.current = this.current+1
+        if(this.interval){
+            let interval = this.interval
+            clearInterval(interval)
+        }
+        this.socket = new WebSocket("ws://localhost:5000");
+        this.socket.onmessage = function(event){
+            let mission = 'mission'+this.missionId
+            let containerNumber = event.data
+            $('.checkbox.inCar').filter('.'+containerNumber).checkbox('check')
+            let allInCar = this.allInCar
+            allInCar = true
+            $('.checkbox.inCar').each(function(){
+                if(!$(this).checkbox('is checked')){
+                    allInCar = false
+                }
+            })
+        }
+        this.interval = setInterval(function(){
+            $('.checkbox.inCar').checkbox('uncheck')
+        },10000)
     },
     update(){
         let port = this.port + this.update_port
@@ -150,11 +177,31 @@ export default {
         let task_pk = this.mission.tasksInfo[this.current].task_pk
         let data = {"phone":phone,"task_pk":task_pk}
         ajax.post(port,data).then(function(data){
+             this.missionStart=false
+             this.socket.close()
              this.nextStep()
         }.bind(this))
     },
     start(){
-
+        if(this.socket)this.socket.close()
+        this.socket = new WebSocket("ws://localhost:5000");
+        this.socket.onmessage = function(event){
+                if(this.missionStart){
+                let mission = 'mission'+this.missionId
+                let $checkbox = $('.'+mission).find('.checkbox')
+                let allchecked = this.allchecked
+                let containerNumber = event.data
+                allchecked = true
+                $('.'+mission).find('.checkbox.'+containerNumber).checkbox('check')
+                $checkbox.each(function(){
+                        if(!$(this).checkbox('is checked')){
+                            allchecked = false
+                        }
+                    })
+                this.allchecked = allchecked
+                }
+        }.bind(this)
+        this.missionStart = true
     }
   },
   watch:{

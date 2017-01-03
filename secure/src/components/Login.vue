@@ -20,6 +20,12 @@
                 <input type="password"  v-model="password" placeholder="密码">
               </div>
             </div>
+            <div class="ui visible message negative" v-if="errorCode==403">
+              <p>您的账号密码不正确</p>
+            </div>
+            <div class="ui visible message negative" v-if="errorCode==400">
+              <p>请正确输入您的账号密码</p>
+            </div>
             <button class="ui fluid large teal submit button" type="submit" @click="login" >登录</button>
           </div>
         </form>
@@ -35,6 +41,7 @@ export default {
       login_port:'/worker/csrf_login',
       username:'',
       password:'',
+      errorCode:''
     }
   },
   props:['userInfo','port'],
@@ -45,10 +52,11 @@ export default {
         let username = this.username
         let password = this.password
         let data = {"username":username,"password":password}
-        ajax.init('csrftoken')
-        let csrftoken = ajax._csrfToken
         ajax.post(port,data).then(function(data){
              this.$emit('finishLogin',data)
+        }.bind(this),function(error){
+            this.errorCode = error.status
+            coonsole.log(error)
         }.bind(this))
     }
   }

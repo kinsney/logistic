@@ -10,60 +10,66 @@ import logging
 logger = logging.getLogger("django")
 @csrf_exempt
 def get_mission_driver(request):
-    user = User.objects.get(username=request.POST["phone"])
-    missions = user.worker.get_today_mission().order_by('time_start')
-    missionInfos = []
-    for mission in missions:
-        guarders = mission.worker.filter(profile="guarder")
-        driver = mission.worker.get(profile="driver")
-        tasks = mission.task_set.order_by('order')
-        car = mission.car
-        guardersInfo = []
-        for guarder in guarders:
-            guarderInfo = {
-                "name":guarder.name,
-                "workerId":guarder.workerId,
-                "avatar":settings.SITE_URL + guarder.avatar.url,
-                "phone":guarder.user.username
+    try:
+        user = User.objects.get(username=request.POST["phone"])
+    except:
+        return HttpResponseForbidden()
+    try:
+        missions = user.worker.get_today_mission().order_by('time_start')
+        missionInfos = []
+        for mission in missions:
+            guarders = mission.worker.filter(profile="guarder")
+            driver = mission.worker.get(profile="driver")
+            tasks = mission.task_set.order_by('order')
+            car = mission.car
+            guardersInfo = []
+            for guarder in guarders:
+                guarderInfo = {
+                    "name":guarder.name,
+                    "workerId":guarder.workerId,
+                    "avatar":settings.SITE_URL + guarder.avatar.url,
+                    "phone":guarder.user.username
+                }
+                guardersInfo.append(guarderInfo)
+            tasksInfo = []
+            for task in tasks:
+                load_containers = task.load_container.all()
+                load_containersInfo = []
+                for load_container in load_containers:
+                    load_containersInfo.append(load_container.number)
+                unload_containers = task.unload_container.all()
+                unload_containersInfo = []
+                for unload_container in unload_containers:
+                    unload_containersInfo.append(unload_container.number)
+                taskInfo = {
+                    "task_pk":task.pk,
+                    "origin":task.origin.__str__(),
+                    "status":task.status,
+                    "load_containers":load_containersInfo,
+                    "unload_containers":unload_containersInfo
+                }
+                tasksInfo.append(taskInfo)
+            missionInfo = {
+                "car":{
+                    "license":car.license,
+                    "status":car.status
+                },
+                "driver":{
+                    "name":driver.name,
+                    "workerId":driver.workerId,
+                    "avatar":settings.SITE_URL + driver.avatar.url,
+                    "phone":driver.user.username
+                },
+                "guarders":guardersInfo,
+                "time_start":mission.time_start.strftime("%Y-%m-%d %H:%M:%S"),
+                "time_end":mission.time_end.strftime("%Y-%m-%d %H:%M:%S"),
+                "tasksInfo":tasksInfo,
+                "current_task":mission.current_task,
+                "mission_pk":mission.pk
             }
-            guardersInfo.append(guarderInfo)
-        tasksInfo = []
-        for task in tasks:
-            load_containers = task.load_container.all()
-            load_containersInfo = []
-            for load_container in load_containers:
-                load_containersInfo.append(load_container.number)
-            unload_containers = task.unload_container.all()
-            unload_containersInfo = []
-            for unload_container in unload_containers:
-                unload_containersInfo.append(unload_container.number)
-            taskInfo = {
-                "task_pk":task.pk,
-                "origin":task.origin.__str__(),
-                "status":task.status,
-                "load_containers":load_containersInfo,
-                "unload_containers":unload_containersInfo
-            }
-            tasksInfo.append(taskInfo)
-        missionInfo = {
-            "car":{
-                "license":car.license,
-                "status":car.status
-            },
-            "driver":{
-                "name":driver.name,
-                "workerId":driver.workerId,
-                "avatar":settings.SITE_URL + driver.avatar.url,
-                "phone":driver.user.username
-            },
-            "guarders":guardersInfo,
-            "time_start":mission.time_start.strftime("%Y-%m-%d %H:%M:%S"),
-            "time_end":mission.time_end.strftime("%Y-%m-%d %H:%M:%S"),
-            "tasksInfo":tasksInfo,
-            "current_task":mission.current_task,
-            "mission_pk":mission.pk
-        }
-        missionInfos.append(missionInfo)
+            missionInfos.append(missionInfo)
+    except:
+        return HttpResponseBadRequest()
     return HttpResponse(json.dumps(missionInfos))
 
 @csrf_exempt

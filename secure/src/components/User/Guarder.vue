@@ -1,10 +1,11 @@
 <template>
 <div id="guarder" class="ui segment stacked">
     <div class="ui pointing secondary menu dynamic">
-        <a class="item active" data-tab='mission'>当前任务</a>
+        <a class="item" :data-tab="'mission'+index" v-for="(mission,index) in missions" v-if="mission.current_task==mission.tasksInfo.length">任务{{index+1}}（完成）</a>
+        <a class="item" :data-tab="'mission'+index" v-for="(mission,index) in missions" v-if="mission.current_task!=mission.tasksInfo.length">任务{{index+1}}</a>
     </div>
-    <div v-for="mission in missions">
-        <mission :mission="mission"></mission>
+    <div v-for="(mission,index) in missions" class="ui tab" :data-tab="'mission'+index">
+        <mission :mission="mission" :port="port" :userInfo="userInfo" :missionId="index"></mission>
     </div>
 </div>
 </template>
@@ -29,8 +30,9 @@ export default {
     let userInfo = this.userInfo
     ajax.post(port,userInfo).then(function(data){
              this.missions = data
-        }.bind(this))
-
+        }.bind(this)).then(function(){
+          $('.menu .item').tab('change tab','mission0');
+        })
   },
   components:{
     mission

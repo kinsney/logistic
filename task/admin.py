@@ -77,3 +77,5 @@ class MissonAdmin(admin.ModelAdmin):
             request, object_id, form_url, extra_context={"mission":mission},
         )
     change_form_template = "admin/task/change.html"
+
+

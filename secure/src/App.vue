@@ -17,7 +17,7 @@ export default {
   data () {
     return {
       userInfo:null,
-      port:'http://localhost:8000',
+      port:'http://10.107.1.89:7000',
     }
   },
   components: {
@@ -36,5 +36,7 @@ export default {
 </script>
 
 <style>
-
+#app{
+  padding: 20px
+}
 </style>

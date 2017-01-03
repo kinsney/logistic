@@ -20,7 +20,7 @@ from . import views
 from django.conf.urls.static import static
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^', admin.site.urls),
     url(r'^worker/',include('worker.urls')),
     url(r'^task/',include('task.urls'))
 ]

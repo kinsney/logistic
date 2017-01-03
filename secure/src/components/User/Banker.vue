@@ -1,11 +1,14 @@
 <template>
 <div id="banker" class="ui segment stacked">
-    <div class="ui pointing secondary menu dynamic">
-        <a class="item active" data-tab='mission'>当前任务</a>
+    <div class="ui pointing secondary menu">
+        <a class="item" data-tab='mission'>当前任务</a>
+        <div class="right menu">
+          <a class="ui button black basic" :href="port+'/container/container'" style="margin-bottom:2px">查看货箱</a>
+        </div>
     </div>
     <div class="ui tab" data-tab='mission'>
-      <div v-for="task in tasks" data-tab='mission'>
-        <bankjob :task="task" :port="port" :userInfo="userInfo"></bankjob>
+      <div v-for="(task,index) in tasks" data-tab='mission'>
+        <bankjob :task="task" :port="port" :userInfo="userInfo" :bankjobId="index"></bankjob>
       </div>
     </div>
 </div>
@@ -26,12 +29,14 @@ export default {
   methods : {
   },
   mounted:function(){
-    $('.menu .item').tab('change tab','mission');
+
     let port = this.port + this.misson_port
     let userInfo = this.userInfo
     ajax.post(port,userInfo).then(function(data){
              this.tasks = data
-        }.bind(this))
+        }.bind(this)).then(function(){
+          $('.menu .item').tab('change tab','mission');
+        })
   },
   components:{
     bankjob

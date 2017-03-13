@@ -5,8 +5,10 @@ STATUS = (
     )
 
 PROFILE = (
-        ('guarder','押解员'),
+        ('guarder','押送员'),
         ('watcher','仓库管理员'),
         ('driver','司机'),
-        ('banker','银行验收员')
+        ('banker','银行验收员'),
+        ('reliver','解款员'),
+        ('keeper','枪支管理员')
     )

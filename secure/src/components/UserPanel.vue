@@ -16,8 +16,8 @@
       </div>
         <Watcher :userInfo="userInfo" v-if="userInfo.profile =='watcher'" :port="port"></Watcher>
         <Banker :userInfo="userInfo" v-if="userInfo.profile =='banker'" :port="port"></Banker>
-        <Guarder :userInfo="userInfo" v-if="userInfo.profile =='guarder'" :port="port"></Guarder>
-        <Driver :userInfo="userInfo" v-if="userInfo.profile =='driver'" :port="port"></Driver>
+        <Guarder :userInfo="userInfo" v-if="userInfo.profile =='guarder'||userInfo.profile =='driver'||userInfo.profile =='reliver'" :port="port"></Guarder>
+        <Keeper :userInfo="userInfo" v-if="userInfo.profile =='keeper'":port="port"></Keeper>
     </div>
 </template>
 <script>
@@ -25,7 +25,7 @@
 import Watcher from './User/Watcher'
 import Guarder from './User/Guarder'
 import Banker from './User/Banker'
-import Driver from './User/Driver'
+import Keeper from './User/Keeper'
 export default {
   name: 'UserPanel',
   data () {
@@ -42,8 +42,10 @@ export default {
       let mapping = {
         "driver":"司机",
         "banker":"银行验收员",
-        "guarder":"押解员",
-        "watcher":"仓库管理员"
+        "guarder":"押送员",
+        "watcher":"仓库管理员",
+        "reliver":"解款员",
+        "keeper":"枪支管理员"
       }
       return mapping[profile]
     }
@@ -52,7 +54,7 @@ export default {
     Watcher,
     Banker,
     Guarder,
-    Driver
+    Keeper
   },
 }
 </script>

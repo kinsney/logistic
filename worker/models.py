@@ -46,10 +46,12 @@ class Worker(models.Model):
     status = models.CharField('工作状态',choices=STATUS,default='working',max_length=20)
     profile = models.CharField('身份',max_length=10,choices=PROFILE)
     def __str__(self):
-        mapping ={"guarder":'押解员',
+        mapping ={"guarder":'押送员',
                  'watcher':'仓库管理员',
                  "driver":"司机",
-                 "banker":"银行验收员"
+                 "banker":"银行验收员",
+                 "reliver":"解款员",
+                 "keeper":"枪支管理员"
                     }
         return "{}-{}".format(mapping[self.profile],self.name)
     def phone(self):
@@ -67,6 +69,7 @@ class Worker(models.Model):
                 m.template = False
                 templateMission = self.mission_set.model.objects.get(pk=templateMissionPk)
                 m.worker.add(*templateMission.worker.all())
+                m.guns.add(*templateMission.guns.all())
                 m.time_start = m.time_start.replace(year = today.year, month = today.month, day = today.day)
                 m.time_end = m.time_end.replace(year = today.year, month = today.month, day = today.day)
                 m.save()
@@ -87,6 +90,7 @@ class Worker(models.Model):
             "guarder": self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
             "watcher":self.partment.task_set.filter(mission__time_start__day=today.day,mission__time_start__month=today.month,mission__time_start__year=today.year,mission__template=False),
             "driver":self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
+            "reliver":self.mission_set.filter(time_start__day=today.day,time_start__month=today.month,time_start__year=today.year,template=False),
             "banker":self.partment.task_set.filter(mission__time_start__day=today.day,mission__time_start__month=today.month,mission__time_start__year=today.year,mission__template=False)
         }
         return returnDict[self.profile]

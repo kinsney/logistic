@@ -64,7 +64,13 @@
                     <td :rowspan="mission.guarders.length+1" v-if="!index">{{mission.car.license}}</td>
                     <td>{{ guarder.workerId}}</td>
                     <td>{{ guarder.name}}</td>
-                    <td>押解员</td>
+                    <td>押送员</td>
+                  </tr>
+                  <tr v-for="(guarder,index) in mission.relivers">
+                    <td :rowspan="mission.guarders.length+1" v-if="!index">{{mission.car.license}}</td>
+                    <td>{{ guarder.workerId}}</td>
+                    <td>{{ guarder.name}}</td>
+                    <td>解款员</td>
                   </tr>
                   <tr>
                     <td>{{ mission.driver.workerId }}</td>
@@ -123,7 +129,7 @@ export default {
   name: 'watcher',
   data () {
     return {
-        misson_port:"/task/get_mission_watcher",
+        mission_port:"/task/get_mission_watcher",
         list_port:"/task/get_mission_driver",
         tasks:[],
         phone:"",
@@ -148,12 +154,12 @@ export default {
       })
     },
     print(index){
-      $('#area'+index).printArea({extraCss:'static/css/table.css'})
+      $('#area'+index).printArea({extraCss:'static/table.css'})
     }
   },
   mounted:function(){
     $('.outside .item').tab('change tab','mission');
-    let port = this.port + this.misson_port
+    let port = this.port + this.mission_port
     let userInfo = this.userInfo
     ajax.post(port,userInfo).then(function(data){
              this.tasks = data

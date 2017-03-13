@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block extrahead %}
+<link rel="stylesheet" href="{% static "semantic/components/modal.min.css" %}">
+<link rel="stylesheet" href="{% static "semantic/components/button.min.css" %}">
+<link rel="stylesheet" href="{% static "semantic/components/icon.min.css" %}">
+<link rel="stylesheet" href="{% static "semantic/components/header.min.css" %}">
+<style>
+     .ui.modal *{
+            box-sizing: border-box;
+        }
+</style>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script href="{% static "semantic/semantic.min.js"%}"></script>
+<script>
+ var socket = new WebSocket("ws://" + window.location.host);
+ socket.onmessage = function(e){
+    if(e.data.split('-').length>1){
+        $('.relieve').show()
+        $('.relieve .cancel').on('click',function(){
+         $('.relieve').hide()
+      })
+
+      var refresh = "/task/mission/"+e.data.split('-')[0]+'/change'
+      $('.relieve .refresh').attr('href',refresh)
+    }
+    else{
+      $('video').get(0).play()
+      $('.alertModal').show()
+      $('.alertModal .cancel').on('click',function(){
+         $('.alertModal').hide()
+         $('video').get(0).pause()
+      })
+      var detail = "/task/mission/"+e.data+'/change'
+      $('.alertModal .detail').attr('href',detail)
+    }
+ }
+ </script>
+{% endblock %}
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+{% endblock %}
+{% block footer %}
+{{ block.super }}
+<div class="ui modal alertModal">
+  <div class="ui icon header">
+    <i class="alarm red icon"></i>
+    紧急报警
+  </div>
+  <div class="content red">
+    <p>收到相关报警信息，请及时前往报警系统或查看任务详情！</p>
+  </div>
+  <div class="actions">
+    <div class="ui button cancel">忽略</div>
+    <a class="ui button teal" href="/alert/alert">前往报警系统</a>
+    <a class="ui button detail red">查看任务详情</a>
+  </div>
+  <video src="{% static "alert.mp3" %}" loop=true style="width: 0"></video>
+</div>
+<div class="ui modal relieve small">
+  <div class="ui icon header">
+    <i class="alarm mute outline icon"></i>
+    解除警报
+  </div>
+  <div class="content red" style="text-align: center">
+    <p>警报已解除，请刷新状态！</p>
+  </div>
+  <div class="actions" style="text-align: center">
+    <a class="ui button refresh teal" href="">刷新状态</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

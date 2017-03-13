@@ -56,7 +56,6 @@ export default {
              this.$emit('finishLogin',data)
         }.bind(this),function(error){
             this.errorCode = error.status
-            coonsole.log(error)
         }.bind(this))
     }
   }

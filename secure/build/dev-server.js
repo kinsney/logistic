@@ -5,6 +5,7 @@ var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
 var http = require('http')
+var url = require('url')
 var ws = require('ws');
 var opn = require('opn')
 var proxyMiddleware = require('http-proxy-middleware')
@@ -64,7 +65,6 @@ wss = new WebSocketServer({port:5000});
 
 wss.on("connection", function(socket) {
     socket.on("message", function(msg) {
-      console.log(wss.clients.length)
         wss.clients.forEach(function(client) {
           if(client!=socket&&client.readyState===1){
             client.send(msg)
@@ -72,6 +72,66 @@ wss.on("connection", function(socket) {
         });
     });
 });
+// 5号输入口 按钮
+// var devicePort = "http://192.168.1.77"
+// var buttonWs = new WebSocketServer({port:4001})
+// buttonWs.on('connection',function(socket){
+//     var button = devicePort + "/ecmd?pin get PA4"
+//     setInterval(function(){
+//         http.get(url.parse(button),function(res){
+//         res.on('data',function(chunk){
+//           buttonWs.clients.forEach(function(client) {
+//             client.send(chunk.toString())
+//           });
+//           })
+//         })
+//     },500)
+// })
+// // 6号输入口 门信号
+// var doorWs = new WebSocketServer({port:4002})
+// doorWs.on('connection',function(socket){
+//     var door = devicePort + "ecmd?pin get PA5"
+//     setInterval(function(){
+//         http.get(url.parse(door),function(res){
+//         res.on('data',function(chunk){
+//           doorWs.clients.forEach(function(client) {
+//             client.send(chunk.toString())
+//           });
+//           })
+//         })
+//     },500)
+// })
+// // 7号输入口 1。2门信号
+// var frontWs = new WebSocketServer({port:4003})
+// frontWs.on('connection',function(socket){
+//     var frontDoor = devicePort + "/ecmd?pin get PA6"
+//     setInterval(function(){
+//         http.get(url.parse(frontDoor),function(res){
+//         res.on('data',function(chunk){
+//           frontWs.clients.forEach(function(client) {
+//             client.send(chunk.toString())
+//           });
+//           })
+//         })
+//     },500)
+// })
+
+// // 8号输入口 3、4门信号
+// var backWs = new WebSocketServer({port:4004})
+// backWs.on('connection',function(socket){
+//     var backDoor = devicePort + "/ecmd?pin get PA7"
+//     setInterval(function(){
+//         http.get(url.parse(backDoor),function(res){
+//         res.on('data',function(chunk){
+//           backWs.clients.forEach(function(client) {
+//             client.send(chunk.toString())
+//           });
+//           })
+//         })
+//     },500)
+// })
+
+
 
 module.exports = app.listen(port, function (err) {
   if (err) {

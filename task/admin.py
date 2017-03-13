@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Mission,Task
 from container.models import Container,Car
 from worker.models import Worker
+from alert.models import GunRoutine
 from django.db.models import Q
 # Register your models here.
 
@@ -27,7 +28,9 @@ class TaskAdmin(admin.ModelAdmin):
             partment = request.user.worker.partment
             return queryset.filter(origin=partment,mission__template=True)
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name=='load_container' or db_field.name=='unload_container':
+        if request.user.is_superuser:
+            kwargs["queryset"] = Container.objects.all()
+        elif db_field.name=='load_container' or db_field.name=='unload_container':
             partment = request.user.worker.partment
             kwargs["queryset"] = Container.objects.filter(partment=partment.parent,status='relaxing')
         return super(TaskAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
@@ -36,7 +39,9 @@ class TaskInline(admin.TabularInline):
     model = Task
     filter_vertical = ('load_container','unload_container',)
     extra = 0
-
+class GunRoutineInline(admin.TabularInline):
+    model = GunRoutine
+    extra = 0
 @admin.register(Mission)
 class MissonAdmin(admin.ModelAdmin):
     def time_start_str(self, obj):
@@ -47,8 +52,9 @@ class MissonAdmin(admin.ModelAdmin):
         return super(MissonAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     def completed_car(self,obj):
         tasks = obj.task_set.all()
+        dones = obj.task_set.filter(Q(status='done')|Q(status='load'))
         if tasks.count()>0:
-            return str(round(obj.current_task/tasks.count()*100)) + "%"
+            return str(round(dones.count()/tasks.count()*100)) + "%"
         else :
             return "未知"
     def completed_bank(self,obj):
@@ -67,10 +73,10 @@ class MissonAdmin(admin.ModelAdmin):
     time_end_str.admin_order_field = 'time_end'
     time_end_str.short_description = "任务结束时间"
     search_fields = ['car']
-    inlines = (TaskInline,)
+    inlines = (TaskInline,GunRoutineInline)
     list_display = ('__str__','time_start_str','car','completed_car','completed_bank','template')
     list_filter = ('time_start','car','template')
-    filter_vertical = ('worker',)
+    filter_vertical = ('worker','guns')
     def change_view(self,request,object_id,form_url="",extra_context=None):
         mission = Mission.objects.get(pk=object_id)
         return super(MissonAdmin, self).change_view(

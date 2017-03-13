@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Container,Car
+from .models import Container,Car,Gun,GunType
 from worker.models import Partment
 # Register your models here.
 @admin.register(Container)
@@ -20,3 +20,12 @@ class ContainerAdmin(admin.ModelAdmin):
 class CarAdmin(admin.ModelAdmin):
     search_fields = ['license']
     list_display = ('license','status')
+
+@admin.register(Gun)
+class GunAdmin(admin.ModelAdmin):
+    list_display = ('number','type','status')
+    list_filter = ('type','status')
+
+@admin.register(GunType)
+class GunTypeAdmin(admin.ModelAdmin):
+    pass

@@ -1,5 +1,5 @@
 from django.db import models
-from container.models import Container,Car
+from container.models import Container,Car,Gun
 from worker.models import Partment,Worker
 from . import STATUS
 # Create your models here.
@@ -12,6 +12,7 @@ class Mission(models.Model):
     worker = models.ManyToManyField(Worker,verbose_name="押运工作人员")
     time_start = models.DateTimeField('开始时间')
     time_end = models.DateTimeField('结束时间')
+    guns = models.ManyToManyField(Gun,verbose_name="枪支")
     current_task = models.SmallIntegerField("当前任务",default=0)
     def __str__(self):
         return "{}由{}执行".format(self.time_start,self.car)
@@ -23,7 +24,7 @@ class Mission(models.Model):
                 return (t.status, t.order)
 
     def update_current_task(self,order_num):
-        if order_num == self.current_task:
+        if order_num == self.current_task :
             self.current_task = order_num+1
             self.save()
 
@@ -53,7 +54,7 @@ class Task(models.Model):
                 c.location = self.mission.car.license
                 c.save()
             for c in self.unload_container.all():
-                c.location = "from"+self.mission.car.license + "to" +self.origin.name
+                c.location = "从"+self.mission.car.license + "到" +self.origin.name
                 c.save()
             self.set_status('load')
             self.mission.update_current_task(self.order)
@@ -73,7 +74,7 @@ class Task(models.Model):
                 c.location = self.origin.name
                 c.save()
             for c in self.load_container.all():
-                c.location = "from"+self.origin.name + "to" +self.mission.car.license
+                c.location = "从"+self.origin.name + "到" +self.mission.car.license
                 c.save()
             self.set_status('receive')
             self.save()

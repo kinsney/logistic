@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'channels',
+    'alert'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -135,11 +137,21 @@ STATICFILES_DIRS = (
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG":{
+            "hosts":[("localhost",6379)],
+        },
+        "ROUTING": "alert.urls.channel_routing",
+    },
+}
 
 CORS_ORIGIN_WHITELIST = (
     'google.com',
     'hostname.example.com',
     'localhost:3000',
-    '127.0.0.1:9000'
+    '127.0.0.1:9000',
+    '192.168.1.102:3000'
 )
 

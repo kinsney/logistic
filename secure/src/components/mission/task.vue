@@ -35,6 +35,16 @@
                                     </h4>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>解款员：</td>
+                                <td>
+                                    <h4 class="ui image header" v-for="reliver in task.relivers">
+                                        <img :src="reliver.avatar" class="ui mini rounded image">
+                                        <div class="content">{{ reliver.name }}</div>
+                                        <div class="description">工号：{{ reliver.workerId }}</div>
+                                    </h4>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

@@ -4,15 +4,18 @@ const app = electron.app
 const { Menu,MenuItem } = electron
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-
+const http = require('http')
 const path = require('path')
 const url = require('url')
+var url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 const port = 3000
 const remote = 'http://localhost:7000'
+const devicePort = "http://192.168.31.77/"
+
 function createWindow () {
   // Create the browser window.
   app.name = "安保系统"
@@ -92,7 +95,7 @@ var express = require('express')
 var main = express();
 main.use(express.static(path.join(__dirname, 'dist')))
 var WebSocketServer = ws.Server
-wss = new WebSocketServer({port:5000});
+var wss = new WebSocketServer({port:5000});
 wss.on("connection", function(socket) {
     socket.on("message", function(msg) {
         wss.clients.forEach(function(client) {
@@ -103,3 +106,16 @@ wss.on("connection", function(socket) {
     });
 });
 main.listen(port)
+
+var deviceWs = new WebSocketServer({port:4000})
+deviceWs.on('connection',function(socket){
+        setInterval(function(){
+        http.get(url.parse(devicePort),function(res){
+        res.on('data',function(chunk){
+          deviceWs.clients.forEach(function(client) {
+            client.send(chunk.toString())
+          });
+        })
+      })
+    },200)
+})

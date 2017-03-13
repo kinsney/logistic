@@ -4,20 +4,24 @@
 {% block object-tools %}
     {{ block.super }}
     {% if not mission.template %}
-    <link rel="stylesheet" href="{% static "semantic/components/step.min.css" %}">
-    <link rel="stylesheet" href="{% static "semantic/components/segment.min.css" %}">
-    <link rel="stylesheet" href="{% static "semantic/components/header.min.css" %}">
-    <link rel="stylesheet" href="{% static "semantic/components/icon.min.css" %}">
-    <link rel="stylesheet" href="{% static "semantic/components/form.min.css" %}">
-    <link rel="stylesheet" href="{% static "semantic/components/message.min.css" %}">
+    <link rel="stylesheet" href="{% static "semantic/components/segment.min.css"%}">
+    <link rel="stylesheet" href="{% static "semantic/components/header.min.css"%}">
+    <link rel="stylesheet" href="{% static "semantic/components/button.min.css"%}">
+    <link rel="stylesheet" href="{% static "semantic/components/form.min.css"%}">
+    <link rel="stylesheet" href="{% static "semantic/components/step.min.css"%}">
+    <link rel="stylesheet" href="{% static "semantic/components/list.min.css"%}">
     <style>
         .task *{
             box-sizing: border-box;
         }
+        .ui *{
+           box-sizing: border-box;
+        }
     </style>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script href="{% static "semantic/semantic.min.js"%}"></script>
     <div class="task">
-        <h4 class="header ui top attached inverted">任务进展</h4>
+        <h4 class="header ui top attached teal">任务进展</h4>
         <div class="ui segment attached">
             <div class="ui steps mini stackable attached">
                 {% for task in mission.task_set.all %}
@@ -80,6 +84,40 @@
                 {% endif %}
             </div>
         </div>
+        {% ifequal mission.alert_set.all.count 0 %}
+        {% else %}
+        <h4 class="header ui attached red">警报情况</h4>
+        <div class="ui segment attached">
+            <div class="ui middle aligned divided list alert">
+                {% for alert in mission.alert_set.all reversed %}
+                    {% ifequal alert.level "danger" %}
+                    <div class="item">
+                        <div class="right floated content">
+                            {% if not alert.status %}
+                                <div class="ui button blue relieve" data="{{ alert.pk }}">解除警报</div>
+                            {% else %}
+                                <div class="ui button disabled">已处理</div>
+                            {% endif %}
+                        </div>
+                        <div class="content">
+                            报警时间：{{alert.added}}
+                        </div>
+                    </div>
+                    {% endifequal %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endifequal %}
     </div>
+    <script>
+    $(function(){
+        var mission_pk = {{ mission.pk }}
+        $('.alert .item .relieve').on('click',function(){
+            var alert_pk = $(this).attr('data')
+            socket.send('unlock-'+mission_pk+'-'+alert_pk)
+        })
+
+    })
+    </script>
     {% endif%}
 {% endblock %}

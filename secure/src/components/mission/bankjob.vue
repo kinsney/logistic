@@ -109,11 +109,12 @@ export default {
         missionStart:false,
         allchecked:false,
         socket:null,
+        port:window.vm.remote
     }
   },
   computed:{
   },
-  props:['task',"port","userInfo","bankjobId"],
+  props:['task',"userInfo","bankjobId"],
   methods : {
     update(){
         let port = this.port + this.update_port

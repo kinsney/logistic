@@ -167,17 +167,17 @@ export default {
         backDoorLocked:false
     }
   },
-  props:['mission',"port","userInfo",'missionId'],
+  props:['mission',"userInfo",'missionId'],
   methods : {
     desName (value,index){
         return value.split('-')[index]
     },
     update(){
-        let port = this.port + this.update_port
+        let port = this.remote + this.update_port
         let phone = this.userInfo.phone
         let task_pk = this.mission.tasksInfo[this.current].task_pk
         let data = {"phone":phone,"task_pk":task_pk}
-        ajax.post(port,data).then(function(data){
+        ajax.post(remote,data).then(function(data){
              this.mission = data
              this.current+=1
              this.missionStart=false

@@ -105,13 +105,14 @@ export default {
         allchecked:false,
         missionStart:false,
         updatePort:'/task/update_routine',
-        taskInfo:null
+        taskInfo:null,
+        port:window.vm.remote
     }
   },
   computed:{
   },
 
-  props:['task',"port","userInfo"],
+  props:['task',"userInfo"],
   methods : {
     verify(){
         this.missionStart = true

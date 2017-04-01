@@ -1,0 +1,10 @@
+
+命令请参考相关文件
+
+snmputil，就是程序名；
+
+get，就理解成获取一个信息；
+
+oid，就是物件识别代码（Object Identifier）。
+
+ 

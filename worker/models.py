@@ -5,7 +5,9 @@ from mptt.managers import TreeManager
 from mptt.models import MPTTModel, TreeForeignKey
 from django.db.models import Q
 from . import STATUS,PROFILE
-
+from .zip import zip_dir
+from logistic.settings import MEDIA_ROOT
+import os
 import datetime
 # Create your models here.
 #
@@ -31,6 +33,8 @@ class Partment(MPTTModel):
         verbose_name_plural = '部门'
 
 class Worker(models.Model):
+    def dir_path(instance,filename):
+        return 'prints/{}'.format(filename)
     user = models.OneToOneField(User, verbose_name='用户', primary_key=True)
     personId = models.CharField('身份证号', max_length=18, validators=[IdCardValidator()], blank=True)
     avatar = models.ImageField('头像',blank=True)
@@ -45,6 +49,8 @@ class Worker(models.Model):
         )
     status = models.CharField('工作状态',choices=STATUS,default='working',max_length=20)
     profile = models.CharField('身份',max_length=10,choices=PROFILE)
+    original_fingerPrint = models.FileField('缓存指纹',upload_to=dir_path,null=True,blank=True)
+    fingerPrint = models.FileField('指纹',upload_to=dir_path,null=True,blank=True)
     def __str__(self):
         mapping ={"guarder":'押送员',
                  'watcher':'仓库管理员',
@@ -99,4 +105,10 @@ class Worker(models.Model):
         verbose_name = '工作人员'
         verbose_name_plural = '工作人员'
 
-
+class PrintVerision(models.Model):
+    number = models.IntegerField('版本号',default=0)
+    def __str__(self):
+        return "指纹版本号为"+str(self.number)
+    class Meta:
+        verbose_name = "指纹版本号"
+        verbose_name_plural = "指纹版本号"

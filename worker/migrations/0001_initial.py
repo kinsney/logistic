@@ -20,6 +20,17 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='PrintVerision',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('number', models.IntegerField(default=0, verbose_name='版本号')),
+            ],
+            options={
+                'verbose_name_plural': '指纹版本号',
+                'verbose_name': '指纹版本号',
+            },
+        ),
+        migrations.CreateModel(
             name='Partment',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),

@@ -62,7 +62,7 @@ app.use(staticPath, express.static('./static'))
 
 var WebSocketServer = ws.Server
 wss = new WebSocketServer({port:5000});
-
+//RFID
 wss.on("connection", function(socket) {
     socket.on("message", function(msg) {
         wss.clients.forEach(function(client) {
@@ -72,6 +72,19 @@ wss.on("connection", function(socket) {
         });
     });
 });
+//指纹
+var printer = new WebSocketServer({port:6001});
+printer.on("connection", function(socket) {
+    socket.on("message", function(msg) {
+        printer.clients.forEach(function(client) {
+          if(client!=socket&&client.readyState===1){
+            client.send(msg)
+          }
+        });
+    });
+});
+
+
 // 5号输入口 按钮
 // var devicePort = "http://192.168.1.77"
 // var buttonWs = new WebSocketServer({port:4001})

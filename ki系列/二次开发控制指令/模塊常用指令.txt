@@ -1,0 +1,81 @@
+
+                            模塊常用指令
+繼電器控制
+
+第1路
+打開：   http://ip/ecmd?io set port 2 4 4 
+         http://ip/ecmd?io set ddr 2 4 4    
+      或者 http://ip/ecmd?pin set p1 on
+關閉：   http://ip/ecmd?io set port 2 0 4 
+         http://ip/ecmd?io set ddr 2 0 4   
+       或者  http://ip/ecmd?pin set p1 off       
+                      
+第2路
+
+打開：   http://ip/ecmd?io set port 2 8 8 
+         http://ip/ecmd?io set ddr 2 8 8  
+    或者 http://ip/ecmd?pin set p2 on  
+關閉：   http://ip/ecmd?io set port 2 0 8 
+         http://ip/ecmd?io set ddr 2 0 8 
+    或者 http://ip/ecmd?pin set p2 off
+
+溫度指令
+
+獲取溫度列表id
+http://ip/ecmd?1w list
+獲取溫度值
+http://ip/ecmd?1w get id
+獲取sht濕度
+http://ip/ecmd?sht humid
+獲取dht濕度
+http://ip/ecmd?dht humid
+
+
+sd卡指令：
+打開sd根目錄
+http://ip/ecmd?sd dir
+讀取sd卡溫濕度記錄數據（也可用批處理工具下載數據）
+http://ip/temp.log
+
+設置ip
+http://ip/ecmd?ip ipadd
+修改netmask
+http://ip/ecmd?netmask xxx.xxx.xxx.xxx //ip为当前设备地址，xxx.xxx.xxx.xxx为需要修改的子掩码
+修改网关
+http://ip/ecmd?gw xxx.xxx.xxx.xxx     //ip为当前设备地址，xxx.xxx.xxx.xxx为需要修改的网关
+系統重啟
+http://ip/ecmd?reset
+
+RFM12 無線2272開關指令（433M 需配置rfm12模塊使用）
+A路
+打開：http://ip/ecmd?rfm12 2272 0,5,80 25 20
+關閉：http://ip/ecmd?rfm12 2272 0,5,81 25 20
+B路
+打開：http://ip/ecmd?rfm12 2272 21,5,80 25 20
+關閉：http://ip/ecmd?rfm12 2272 21,5,81 25 20
+
+C路
+打開：http://ip/ecmd?rfm12 2272 0,20,80 25 20
+關閉：http://ip/ecmd?rfm12 2272 0,20,81 25 20
+D路
+打開：http://ip/ecmd?rfm12 2272 20,20,80 25 20
+關閉：http://ip/ecmd?rfm12 2272 20,20,81 25 20
+E路
+打開：http://ip/ecmd?rfm12 2272 20,21,80 25 20
+關閉：http://ip/ecmd?rfm12 2272 20,21,81 25 20
+
+
+FM12 433M模块指令（433M 需配置rfm12模塊网络主板使用）
+
+rf转ir设备背面有设备的编号：例如 2272123456
+
+命令格式如下：
+
+http://ip/ecmd?rfm12 2272 12,34,56 XX 30   
+
+说明 上面ip为设备的ip地址，XX可有客户自定义数字1-99，XX每变化一个数据就相当于一条命令。
+
+友情提示：空格部分可以加转义字符%20，根据程序工程师喜好决定
+例如：http://ip/ecmd?rfm12%202272%2012,34,56%20XX%2030
+
+                  

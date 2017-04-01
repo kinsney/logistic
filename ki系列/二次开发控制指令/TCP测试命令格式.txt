@@ -1,0 +1,29 @@
+下载tcp udp测试工具
+首先建立客户端
+发送区域输入以下命令，下面命令中%20是空格的转义符。
+GET /ecmd?pin%20set%20k1%20on HTTP/1.1\r\n   控制第1路开
+GET /ecmd?pin%20set%20k1%20off HTTP/1.1\r\n  控制第1路关
+GET /ecmd?pin%20set%20k2%20on HTTP/1.1\r\n   控制第2路开
+GET /ecmd?pin%20set%20k2%20off HTTP/1.1\r\n  控制第2路关
+共6路 依次类推
+
+
+
+GET /ecmd?channel%20255%20255%20255%20255 HTTP/1.1\r\n
+
+ip修改
+GET /ecmd?ip%20newip HTTP/1.1\r\n   命令中newip是新ip，比如新的ip为192.168.1.100，测命令格式为 GET /ecmd?ip%20192.168.1.100 HTTP/1.1\r\n
+
+网关修改
+GET /ecmd?gw%20newgw HTTP/1.1\r\n   命令中newgw是新gw，比如新的ip为192.168.1.1，测命令格式为 GET /ecmd?ip%20192.168.1.1 HTTP/1.1\r\n
+
+重启命令
+GET /ecmd?reset HTTP/1.1\r\n 
+
+
+
+
+定制的延时命令（默认设备没有此命令）
+                  _____________命令中%20后面的1就是延时的值，单位为秒，如果这个位置为60，就是60秒，如果值大于1800（30分钟，不包含1800），此通道就转换为自锁（常闭或常开）。
+                 |
+GET /ecmd?dtch%201 HTTP/1.1\r\n

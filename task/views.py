@@ -7,6 +7,7 @@ from django.conf import settings
 from task.models import Task,Mission
 from alert.models import Alert,GunRoutine
 from container.models import Car
+from worker.models import Worker
 import json
 import datetime
 
@@ -101,6 +102,22 @@ def get_mission_driver(request):
         return HttpResponseForbidden()
     try:
         missions = user.worker.get_today_mission().order_by('time_start')
+        missionInfos = []
+        for mission in missions:
+            missionInfo = getMission(mission)
+            missionInfos.append(missionInfo)
+    except:
+        return HttpResponseBadRequest()
+    return HttpResponse(json.dumps(missionInfos))
+
+@csrf_exempt
+def print_get_mission_driver(request):
+    try:
+        worker = Worker.objects.get(pk=request.POST["pk"])
+    except:
+        return HttpResponseForbidden()
+    try:
+        missions = worker.get_today_mission().order_by('time_start')
         missionInfos = []
         for mission in missions:
             missionInfo = getMission(mission)

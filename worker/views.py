@@ -7,6 +7,7 @@ from django.middleware import csrf
 from django.forms.models import model_to_dict
 from django.conf import settings
 from container.models import Container
+from .models import PrintVerision,Worker
 import os
 import logging
 import json
@@ -30,7 +31,6 @@ def csrf_login(request):
     if user is None:
         return HttpResponseForbidden()
     do_login(request,user)
-    partment_containers = Container.objects.filter(partment=user.worker.partment,status='relaxing')
     extra = {
         "phone":user.username,
         "partment":user.worker.partment.__str__(),
@@ -39,9 +39,32 @@ def csrf_login(request):
         "personId":user.worker.personId,
         "avatar":settings.SITE_URL + user.worker.avatar.url
     }
-    userInfo = model_to_dict(user.worker)
+    userInfo = model_to_dict(worker)
     userInfo.update(extra)
     return HttpResponse(json.dumps(userInfo))
 
+@csrf_exempt
+def print_login(request):
+    try:
+        pk = request.POST['pk']
+    except (KeyError,AssertionError):
+        return HttpResponseBadRequest()
+    try:
+        worker = Worker.objects.get(pk=pk)
+    except:
+        return HttpResponseForbidden()
+    extra = {
+        "phone":worker.user.username,
+        "partment":worker.partment.__str__(),
+        "profile":worker.profile,
+        "name":worker.name,
+        "personId":worker.personId,
+        "avatar":settings.SITE_URL + worker.avatar.url
+    }
+    userInfo = model_to_dict(worker,exclude=["fingerPrint","original_fingerPrint"])
+    userInfo.update(extra)
+    return HttpResponse(json.dumps(userInfo))
 
-
+def version(request):
+    version = PrintVerision.objects.all()[0]
+    return HttpResponse(version.number)

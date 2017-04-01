@@ -1,0 +1,36 @@
+以下为串口终端输入常用指令
+
+ip          -- 网络地址
+mac         -- mac地址
+gw          -- 网络网关
+netmask     -- 网络子掩码
+伪指令
+pin set px on     -- 打开第x路继电器
+pin set px off    -- 关闭第x路继电器
+
+例如打开第一路继电器指令为
+pin set p1 on     -- 打开第1路继电器
+pin set p1 off    -- 关闭第1路继电器
+
+1w list     -- 列出所有温度id
+1w get id  -- 返回值为温度值，id为温度的编号。
+reset         -- 系统重启
+   
+以下是网络的接口指令
+設置ip
+http://ip/ecmd?ip xxx.xxx.xxx.xxx   //ip为当前设备地址，xxx.xxx.xxx.xxx为需要修改的ip地址
+修改netmask
+http://ip/ecmd?netmask xxx.xxx.xxx.xxx //ip为当前设备地址，xxx.xxx.xxx.xxx为需要修改的子掩码
+修改网关
+http://ip/ecmd?gw xxx.xxx.xxx.xxx     //ip为当前设备地址，xxx.xxx.xxx.xxx为需要修改的网关
+系統重啟
+http://ip/ecmd?reset
+
+第一路继电器指令
+http://ip/ecmd?pin set p1 on     -- 打开第1路继电器
+http://ip/ecmd?pin set p1 off      关闭第1路继电器
+伪指令
+http://ip/ecmd?pin set px on     -- 打开第x路继电器
+http://ip/ecmd?pin set px off    -- 关闭第x路继电器
+
+

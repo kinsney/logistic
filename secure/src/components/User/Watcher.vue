@@ -4,7 +4,7 @@
         <a class="item active" data-tab='mission'>当前任务</a>
         <a class="item" data-tab='list'>打印任务清单</a>
         <div class="right menu">
-        <a class="ui button black basic" :href="port+'/container/container'" style="margin-bottom:2px">查看货箱</a>
+        <a class="ui button black basic" :href='port+"/container/container"'style="margin-bottom:2px">查看货箱</a>
         </div>
     </div>
     <div class="ui tab" data-tab="mission">
@@ -17,26 +17,17 @@
         <div class="column" style="max-width:450px">
           <h2 class="ui teal image header">
             <div class="content">
-              输入手机号码
+              请输入指纹
             </div>
           </h2>
-          <form class="ui large form">
-            <div class="ui stacked segment">
-              <div class="field">
-                <div class="ui left icon input">
-                  <i class="user icon"></i>
-                  <input type="text"  v-model="phone" placeholder="手机号">
-                </div>
-              </div>
-              <div class="ui visible message negative" v-if="errorCode==403">
-              <p>请正确输入工作人员的手机号码</p>
+          <div class="ui bottom attached tab segment" data-tab="fingerprint">
+            <div class="ui visible message negative" v-if="errorCode==403">
+              <p>未知错误，请联系管理员</p>
               </div>
               <div class="ui visible message negative" v-if="errorCode==400">
-                <p>该手机号不属于押运人员</p>
+                <p>该指纹不属于押运人员</p>
               </div>
-              <button class="ui fluid large teal submit button" @click="getForm" >获取任务清单</button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
       <div v-else>
@@ -135,7 +126,9 @@ export default {
         phone:"",
         list:[],
         isLogged:false,
-        errorCode:""
+        errorCode:"",
+        print_port:"/task/print_get_mission_driver",
+        socket:null
     }
   },
   props:['userInfo','port'],
@@ -155,6 +148,22 @@ export default {
     },
     print(index){
       $('#area'+index).printArea({extraCss:'static/table.css'})
+    },
+    print_login(){
+      let port = this.port + this.print_port
+      this.socket = new WebSocket("ws://localhost:6001")
+      this.socket.onmessage = function(event){
+        let pk = Number(event.data)
+        let info = {"pk":pk}
+        ajax.post(port,info).then(function(data){
+          this.list = data
+          this.isLogged = true
+        }.bind(this),function(error){
+          this.errorCode = error.status
+        }.bind(this)).then(function(){
+          $('.inside .item').tab('change tab','mission0');
+        })
+      }.bind(this)
     }
   },
   mounted:function(){
@@ -164,6 +173,7 @@ export default {
     ajax.post(port,userInfo).then(function(data){
              this.tasks = data
         }.bind(this))
+    this.print_login()
   },
   components:{
     task

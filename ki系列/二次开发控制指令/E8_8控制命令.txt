@@ -1,0 +1,68 @@
+以下的ip就是设备的ip地址，标签上有，默认是：192.168.1.88
+以下命令中ip为192.168.1.88 例如：http://192.168.1.88/ecmd?pin set k1 on
+第一路继电器指令
+http://ip/ecmd?pin set k1 on     -- 打开第1路继电器
+http://ip/ecmd?pin set k1 off      关闭第1路继电器
+获取继电器1状态
+http://ip/ecmd?pin get k1       返回值 on/off
+
+第二路继电器指令
+http://ip/ecmd?pin set k2 on     -- 打开第2路继电器
+http://ip/ecmd?pin set k2 off      关闭第2路继电器
+获取继电器2状态
+http://ip/ecmd?pin get k2       返回值 on/off
+
+第三路继电器指令
+http://ip/ecmd?pin set k3 on     -- 打开第3路继电器
+http://ip/ecmd?pin set k3 off      关闭第3路继电器
+获取继电器3状态
+http://ip/ecmd?pin get k3       返回值 on/off
+
+第四路继电器指令
+http://ip/ecmd?pin set k4 on     -- 打开第4路继电器
+http://ip/ecmd?pin set k4 off      关闭第4路继电器
+获取继电器4状态
+http://ip/ecmd?pin get k4       返回值 on/off
+
+第五路继电器指令
+http://ip/ecmd?pin set k5 on     -- 打开第5路继电器
+http://ip/ecmd?pin set k5 off      关闭第5路继电器
+获取继电器5状态
+http://ip/ecmd?pin get k5       返回值 on/off
+
+第六路继电器指令
+http://ip/ecmd?pin set k6 on     -- 打开第6路继电器
+http://ip/ecmd?pin set k6 off      关闭第6路继电器
+获取继电器6状态
+http://ip/ecmd?pin get k6       返回值 on/off
+
+第七路继电器指令
+http://ip/ecmd?pin set k7 on     -- 打开第7路继电器
+http://ip/ecmd?pin set k7 off      关闭第7路继电器
+获取继电器7状态
+http://ip/ecmd?pin get k7       返回值 on/off
+
+第八路继电器指令
+http://ip/ecmd?pin set k8 on     -- 打开第8路继电器
+http://ip/ecmd?pin set k8 off      关闭第8路继电器
+获取继电器8状态
+http://ip/ecmd?pin get k8       返回值 on/off
+
+
+9-16路可外部扩展板控制，也可以软件控制，软件控制参考前8路控制命令
+修改k9.......k16即可。
+
+获取扩展上的输入状态：
+http://ip/ecmd?pin get PA0         ---on/off  第1路
+http://ip/ecmd?pin get PA1         ---on/off  第2路
+http://ip/ecmd?pin get PA2         ---on/off  第3路
+。。。。。。。共8路
+
+
+
+
+
+
+
+
+

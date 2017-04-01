@@ -1,0 +1,106 @@
+以下为串口终端输入常用指令
+
+ip          -- 网络地址
+mac         -- mac地址
+gw          -- 网络网关
+netmask     -- 网络子掩码
+
+例如打开第一路继电器指令为
+pin set k1 on     -- 打开第1路继电器
+十六进制为: 70 69 6E 20 73 65 74 20 6B 31 20 6F 6E 0D 0A 
+pin set k1 off    -- 关闭第1路继电器
+十六进制为: 70 69 6E 20 73 65 74 20 6B 31 20 6F 66 66 0D 0A
+获取第一路状态指令
+pin get k1       -- 返回值为on/off
+例如打开第二路继电器指令为
+pin set k2 on     -- 打开第2路继电器
+pin set k2 off    -- 关闭第2路继电器
+获取第一路状态指令
+pin get k2       -- 返回值为on/off
+共6路，其它指令依次类推 k3,k4,k5,k6.
+全开指令：
+io set port 2 fc
+全关闭指令：
+io set port 2 0
+注意用十六进制是后面多 （0D 0A）这个是换行的值。 
+
+1w list     -- 列出所有温度id
+1w get id  -- 返回值为温度值，id为温度的编号。
+reset         -- 系统重启
+   
+以下是网络的接口指令
+設置ip
+http://ip/ecmd?ip ipadd    ip是当前ip，ipadd为新的ip 比如 http://192.168.1.88/ecmd?ip 192.168.0.88
+修改netmask
+http://ip/ecmd?netmask xxx.xxx.xxx.xxx //ip为当前设备地址，xxx.xxx.xxx.xxx为需要修改的子掩码
+修改网关
+http://ip/ecmd?gw xxx.xxx.xxx.xxx     //ip为当前设备地址，xxx.xxx.xxx.xxx为需要修改的网关
+查看mac
+http://ip/ecmd?mac
+系統重啟
+http://ip/ecmd?reset
+
+溫度指令
+獲取溫度列表id
+http://ip/ecmd?1w list
+獲取溫度值
+http://ip/ecmd?1w get id
+
+如果加温度传感器的话，可以通过命令设置上下限的值控制继电器，命令如下
+第1路
+下限设置：http://ip/ecmd?i2c wbd 80 10 xx   -- xx 代表16进制的值
+下限读取：http://ip/ecmd?i2c rbd 80 10      -- 返回值就是下限值
+上限设置：http://ip/ecmd?i2c wbd 80 15 xx   -- xx 代表16进制的值
+上限读取：http://ip/ecmd?i2c rbd 80 15      -- 返回值就是下限值
+第2路
+下限设置：http://ip/ecmd?i2c wbd 80 20 xx   -- xx 代表16进制的值
+下限读取：http://ip/ecmd?i2c rbd 80 20      -- 返回值就是下限值
+上限设置：http://ip/ecmd?i2c wbd 80 25 xx   -- xx 代表16进制的值
+上限读取：http://ip/ecmd?i2c rbd 80 25      -- 返回值就是下限值
+第3路
+下限设置：http://ip/ecmd?i2c wbd 80 30 xx   -- xx 代表16进制的值
+下限读取：http://ip/ecmd?i2c rbd 80 30      -- 返回值就是下限值
+上限设置：http://ip/ecmd?i2c wbd 80 35 xx   -- xx 代表16进制的值
+上限读取：http://ip/ecmd?i2c rbd 80 35      -- 返回值就是下限值
+第4路
+下限设置：http://ip/ecmd?i2c wbd 80 40 xx   -- xx 代表16进制的值
+下限读取：http://ip/ecmd?i2c rbd 80 40      -- 返回值就是下限值
+上限设置：http://ip/ecmd?i2c wbd 80 45 xx   -- xx 代表16进制的值
+上限读取：http://ip/ecmd?i2c rbd 80 45      -- 返回值就是下限值
+第5路
+下限设置：http://ip/ecmd?i2c wbd 80 50 xx   -- xx 代表16进制的值
+下限读取：http://ip/ecmd?i2c rbd 80 50      -- 返回值就是下限值
+上限设置：http://ip/ecmd?i2c wbd 80 55 xx   -- xx 代表16进制的值
+上限读取：http://ip/ecmd?i2c rbd 80 55      -- 返回值就是下限值
+第6路
+下限设置：http://ip/ecmd?i2c wbd 80 60 xx   -- xx 代表16进制的值
+下限读取：http://ip/ecmd?i2c rbd 80 60      -- 返回值就是下限值
+上限设置：http://ip/ecmd?i2c wbd 80 65 xx   -- xx 代表16进制的值
+上限读取：http://ip/ecmd?i2c rbd 80 65      -- 返回值就是下限值
+
+
+
+
+
+
+第一路继电器指令
+http://ip/ecmd?pin set k1 on     -- 打开第1路继电器
+http://ip/ecmd?pin set k1 off      关闭第1路继电器
+继电器1状态
+http://ip/ecmd?pin get k1       返回值 on/off
+
+全开命令(1-6)：
+http://ip/ecmd?io set port 2 fc  ---全开
+http://ip/ecmd?io set port 2 0   ---全关
+返回所有状态
+http://ip/ecmd?io get port 2
+
+伪指令
+http://ip/ecmd?pin set kx on     -- 打开第x路继电器
+http://ip/ecmd?pin set kx off    -- 关闭第x路继电器
+
+http://ip/ecmd?pin get kx       返回值 on/off
+
+2路和6路设备如果为点动，可通过命令修改延时时间
+http://ip/ecmd?dtime xxx         -- xxx为10进制的数，比如你要改为60秒延时，xxx就是60.                                                         
+

@@ -39,7 +39,7 @@ def csrf_login(request):
         "personId":user.worker.personId,
         "avatar":settings.SITE_URL + user.worker.avatar.url
     }
-    userInfo = model_to_dict(worker)
+    userInfo = model_to_dict(user.worker,exclude=["fingerPrint","original_fingerPrint"])
     userInfo.update(extra)
     return HttpResponse(json.dumps(userInfo))
 

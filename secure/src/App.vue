@@ -17,7 +17,7 @@ export default {
   data () {
     return {
       userInfo:null,
-      port:'http://localhost:7000',
+      port:'http://120.27.118.166',
     }
   },
   components: {

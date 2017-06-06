@@ -1,29 +1,29 @@
-const electron = require('electron')
+'use strict'
+var electron = require('electron')
 // Module to control application life.
-const app = electron.app
-const { Menu,MenuItem } = electron
+var app = electron.app
+var { Menu,MenuItem } = electron
 // Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
-const http = require('http')
-const path = require('path')
-const url = require('url')
+var BrowserWindow = electron.BrowserWindow
+var http = require('http')
+var path = require('path')
 var url = require('url')
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
-const port = 3000
-const remote = 'http://localhost:7000'
-const devicePort = "http://192.168.31.77/"
+var mainWindow
+var port = 3000
+var devicePort = "http://10.107.2.77"
 
 function createWindow () {
   // Create the browser window.
   app.name = "安保系统"
   mainWindow = new BrowserWindow({width: 1200, height: 800})
-
+mainWindow.webContents.openDevTools()
   // and load the index.html of the app.
+
+var remote = 'http://120.27.118.166'
   mainWindow.loadURL('http://localhost:'+port)
-  const template = [
+  var template = [
     {
         submenu:[
           {
@@ -54,8 +54,9 @@ function createWindow () {
         type:'separator'
       }
     ]}]
-  const menu = Menu.buildFromTemplate(template)
+  var menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
+
   // Open the DevTools.
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -95,27 +96,190 @@ var express = require('express')
 var main = express();
 main.use(express.static(path.join(__dirname, 'dist')))
 var WebSocketServer = ws.Server
-var wss = new WebSocketServer({port:5000});
-wss.on("connection", function(socket) {
+main.listen(port)
+  var wss = new WebSocketServer({port:5000});
+  //RFID
+  wss.on("connection", function(socket) {
+      socket.on("message", function(msg) {
+          wss.clients.forEach(function(client) {
+            if(client!=socket&&client.readyState===1){
+              client.send(msg)
+            }
+          });
+      });
+  });
+wss.on('error',function(e){
+	console.log(e)
+})
+//指纹
+  var printer = new WebSocketServer({port:6001});
+  printer.on("connection", function(socket) {
+      socket.on("message", function(msg) {
+          printer.clients.forEach(function(client) {
+            if(client!=socket&&client.readyState===1){
+              client.send(msg)
+            }
+          });
+      });
+  });
+printer.on('error',function(e){
+	console.log(e)
+})
+
+// 手持
+var handset = new WebSocketServer({port:7001});
+handset.on("connection", function(socket) {
     socket.on("message", function(msg) {
-        wss.clients.forEach(function(client) {
+        handset.clients.forEach(function(client) {
           if(client!=socket&&client.readyState===1){
+            console.log(msg)
             client.send(msg)
           }
         });
     });
 });
-main.listen(port)
+handset.on('error',function(e){
+	console.log(e)
+})
+// 5号输入口 按钮
 
-var deviceWs = new WebSocketServer({port:4000})
-deviceWs.on('connection',function(socket){
-        setInterval(function(){
-        http.get(url.parse(devicePort),function(res){
+var buttonWs = new WebSocketServer({port:4001})
+buttonWs.on('connection',function(socket){
+    var button = devicePort + "/ecmd?pin get PA6"
+    var connection = function(){
+        http.get(url.parse(button),function(res){
         res.on('data',function(chunk){
-          deviceWs.clients.forEach(function(client) {
+          buttonWs.clients.forEach(function(client) {
             client.send(chunk.toString())
           });
+        res.on('end',function(){setTimeout(connection,500)})
+          })
+        res.on('error',function(){
+        	console.log(123)
         })
-      })
-    },200)
+        }).on('error',function(e){
+        	console.log(e)
+        })
+    }
+    connection()
 })
+
+// 6号输入口 门信号
+
+var doorWs = new WebSocketServer({port:4002})
+doorWs.on('connection',function(socket){
+    var door = devicePort + "/ecmd?pin get PA5"
+    var connection = function(){
+        http.get(url.parse(door),function(res){
+        res.on('data',function(chunk){
+          doorWs.clients.forEach(function(client) {
+            client.send(chunk.toString())
+          });
+        res.on('end',function(){setTimeout(connection,500)})
+          })
+        res.on('error',function(){
+        	console.log(123)
+        })
+        }).on('error',function(e){
+        	console.log(e)
+        })
+    }
+    connection()
+})
+// var doorWs = new WebSocketServer({port:4002})
+// doorWs.on('connection',function(socket){
+//     var door = devicePort + "/ecmd?pin get PA5"
+//     setInterval(function(){
+//         http.get(url.parse(door),function(res){
+//         res.on('data',function(chunk){
+//           doorWs.clients.forEach(function(client) {
+//             client.send(chunk.toString())
+//           });
+//           })
+//         res.on('error',function(){
+//         	console.log(123)
+//         })
+//         })
+//     },500)
+// })
+// doorWs.on('error',function(e){
+// 	console.log(e)
+// })
+//7号输出口 1。2门信号
+var frontWs = new WebSocketServer({port:4003})
+frontWs.on('connection',function(socket){
+    var frontDoor = devicePort + "/ecmd?pin get PA6"
+    var connection = function(){
+        http.get(url.parse(frontDoor),function(res){
+        res.on('data',function(chunk){
+          frontWs.clients.forEach(function(client) {
+            client.send(chunk.toString())
+          });
+        res.on('end',function(){setTimeout(connection,500)})
+          })
+        res.on('error',function(){
+        	console.log(123)
+        })
+        }).on('error',function(e){
+        	console.log(e)
+        })
+    }
+    connection()
+})
+
+// var frontWs = new WebSocketServer({port:4003})
+// frontWs.on('connection',function(socket){
+//     var frontDoor = devicePort + "/ecmd?pin get PA6"
+//     setInterval(function(){
+
+//         http.get(url.parse(frontDoor),function(res){
+//         res.on('data',function(chunk){
+//           frontWs.clients.forEach(function(client) {
+//             client.send(chunk.toString())
+//           });
+//           })
+//         })
+//     },500)
+// })
+// frontWs.on('error',function(e){
+// 	console.log(e)
+// })
+// // 8号输出口 3、4门信号 门是否关牢
+var backWs = new WebSocketServer({port:4004})
+backWs.on('connection',function(socket){
+    var backDoor = devicePort + "/ecmd?pin get PA5"
+    var connection = function(){
+        http.get(url.parse(backDoor),function(res){
+        res.on('data',function(chunk){
+          backWs.clients.forEach(function(client) {
+            client.send(chunk.toString())
+          });
+        res.on('end',function(){setTimeout(connection,500)})
+          })
+        res.on('error',function(){
+        	console.log(123)
+        })
+        }).on('error',function(e){
+        	console.log(e)
+        })
+    }
+    connection()
+})
+// var backWs = new WebSocketServer({port:4004})
+// backWs.on('connection',function(socket){
+//     var backDoor = devicePort + "/ecmd?pin get PA7"
+
+//     setInterval(function(){
+
+//         http.get(url.parse(backDoor),function(res){
+//         res.on('data',function(chunk){
+//           backWs.clients.forEach(function(client) {
+//             client.send(chunk.toString())
+//           });
+//           })
+//         })
+//     },500)
+// })
+// backWs.on('error',function(e){
+// 	console.log(e)
+// })

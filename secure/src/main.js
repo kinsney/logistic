@@ -5,8 +5,9 @@ import App from './App'
 
 window.vm = new Vue({
   data:{
-    devicePort:"http://192.168.1.77",
-    remote:"localhost:7000"
+    devicePort:"http://192.168.0.77",
+    remote:"120.27.118.166",
+    websocket:"120.27.118.166:3330/websocket"
   },
   el: '#app',
   template: '<App/>',

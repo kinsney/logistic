@@ -241,3 +241,15 @@ def update_routine(request):
         return HttpResponse(json.dumps(missionInfo))
     except:
         return HttpResponseForbidden()
+
+
+@csrf_exempt
+def handset_report(request):
+    task_pk = request.POST['task_pk']
+    task = Task.objects.get(pk=task_pk)
+    if task.status == 'load' or task.status == 'receive':
+        task.status = 'done'
+        task.save()
+    mission = task.mission
+    missionInfo = getMission(mission)
+    return HttpResponse(json.dumps(missionInfo))

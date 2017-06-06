@@ -15,25 +15,30 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script href="{% static "semantic/semantic.min.js"%}"></script>
 <script>
- var socket = new WebSocket("ws://" + window.location.host);
+ var socket = new WebSocket("ws://" + window.location.host+':3330/websocket');
  socket.onmessage = function(e){
-    if(e.data.split('-').length>1){
+    let message = e.data.split('-')
+    if(message[0]=='unlock'){
         $('.relieve').show()
         $('.relieve .cancel').on('click',function(){
          $('.relieve').hide()
       })
-
-      var refresh = "/task/mission/"+e.data.split('-')[0]+'/change'
+      var refresh = "/task/mission/"+message[1]+'/change'
       $('.relieve .refresh').attr('href',refresh)
     }
-    else{
-      $('video').get(0).play()
+    if(message[0]=='lock'){
       $('.alertModal').show()
       $('.alertModal .cancel').on('click',function(){
          $('.alertModal').hide()
          $('video').get(0).pause()
       })
-      var detail = "/task/mission/"+e.data+'/change'
+      if(message[-1]=='danger'){
+          $('video').get(0).play()
+          $('.atext').html('紧急报警')
+      }else{
+        $('.atext').html('一般报警')
+      }
+      var detail = "/task/mission/"+message[1]+'/change'
       $('.alertModal .detail').attr('href',detail)
     }
  }
@@ -45,9 +50,9 @@
 {% block footer %}
 {{ block.super }}
 <div class="ui modal alertModal">
-  <div class="ui icon header">
+  <div class="ui icon header danger">
     <i class="alarm red icon"></i>
-    紧急报警
+    <span class="atext"></span>
   </div>
   <div class="content red">
     <p>收到相关报警信息，请及时前往报警系统或查看任务详情！</p>

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
 from worker.validators import IdCardValidator
 from mptt.managers import TreeManager
@@ -11,6 +12,11 @@ import os
 import datetime
 # Create your models here.
 #
+class OverwriteStorage(FileSystemStorage):
+    def get_available_name(self,name):
+        if self.exists(name):
+            os.remove(os.path.join(MEDIA_ROOT,name))
+        return name
 class Partment(MPTTModel):
     parent = TreeForeignKey(
         'self',
@@ -50,7 +56,7 @@ class Worker(models.Model):
     status = models.CharField('工作状态',choices=STATUS,default='working',max_length=20)
     profile = models.CharField('身份',max_length=10,choices=PROFILE)
     original_fingerPrint = models.FileField('缓存指纹',upload_to=dir_path,null=True,blank=True)
-    fingerPrint = models.FileField('指纹',upload_to=dir_path,null=True,blank=True)
+    fingerPrint = models.FileField('指纹',upload_to=dir_path,null=True,blank=True,storage=OverwriteStorage())
     def __str__(self):
         mapping ={"guarder":'押送员',
                  'watcher':'仓库管理员',
